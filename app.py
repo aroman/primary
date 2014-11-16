@@ -5,6 +5,8 @@ import tornado.options
 import tornado.websocket
 import tornado.platform.asyncio
 
+import color
+
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
