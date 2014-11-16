@@ -30,5 +30,9 @@ application = tornado.web.Application([
 if __name__ == "__main__":
     tornado.platform.asyncio.AsyncIOMainLoop().install()
     tornado.options.parse_command_line()
-    Application().listen(8888)
+    if 'PORT' in os.environ:
+        port = os.environ['PORT']
+    else:
+        port = 8888
+    Application().listen(port)
     asyncio.get_event_loop().run_forever()
