@@ -27,7 +27,6 @@ class MainHandler(tornado.web.RequestHandler):
 
 class PairHandler(tornado.web.RequestHandler):
     def get(self):
-        print("yo")
         self.render("pair.html")
 
 class EchoWebSocket(tornado.websocket.WebSocketHandler):

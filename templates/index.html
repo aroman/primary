@@ -21,7 +21,8 @@
     <img src="static/img/banner.png">
   </body>
   <script>
-    var ws = new WebSocket("ws://localhost:8888/websocket");
+    var host = location.origin.replace(/^http/, 'ws')
+    var ws = new WebSocket(host + "/websocket");
     ws.onopen = function() {
        ws.send("Hello, world");
     };
