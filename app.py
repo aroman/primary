@@ -7,7 +7,6 @@ import tornado.platform.asyncio
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("index.html")
-        # self.write("Hello, world")
 
 class Application(tornado.web.Application):
     def __init__(self):
