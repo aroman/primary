@@ -2,16 +2,15 @@ import os
 import asyncio
 import tornado.web
 import tornado.options
+import tornado.websocket
 import tornado.platform.asyncio
-
-class MainHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.render("index.html")
 
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/", MainHandler),
+            (r"/pair", PairHandler),
+            (r"/websocket", EchoWebSocket),
         ]
 
         settings = dict(
@@ -22,9 +21,24 @@ class Application(tornado.web.Application):
 
         super().__init__(handlers, **settings)
 
-application = tornado.web.Application([
-    (r"/", MainHandler),
-], )
+class MainHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("index.html")
+
+class PairHandler(tornado.web.RequestHandler):
+    def get(self):
+        print("yo")
+        self.render("pair.html")
+
+class EchoWebSocket(tornado.websocket.WebSocketHandler):
+    def open(self):
+        print("WebSocket opened")
+
+    def on_message(self, message):
+        self.write_message(u"You said: " + message)
+
+    def on_close(self):
+        print("WebSocket closed")
 
 if __name__ == "__main__":
     tornado.platform.asyncio.AsyncIOMainLoop().install()
