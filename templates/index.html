@@ -1,34 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>PRIMARY</title>
-  <link rel="icon" type="image/png" href="/static/img/favicon.png"/>
-  <style>
-    body {
-      background-color: #2D2D2D;
-    }
-    img {
-      margin: auto;
-      position: absolute;
-      top: 0px;
-      left: 0;
-      bottom: 0px;
-      right: 0px;
-      width: 100%;
-    }
-  </style>
-</head>
-  <body>
-    <img src="static/img/banner.png">
-  </body>
-  <script>
-    var host = location.origin.replace(/^http/, 'ws')
-    var ws = new WebSocket(host + "/websocket");
-    ws.onopen = function() {
-       ws.send("Hello, world");
-    };
-    ws.onmessage = function (evt) {
-       alert(evt.data);
-    };
-  </script>
-</html>
+{% extends "base.html" %}
+
+{% block body %}
+
+<style>
+  #banner {
+    margin: auto;
+    position: absolute;
+    top: 0px;
+    left: 0;
+    bottom: 0px;
+    right: 0px;
+    width: 100%;
+  }
+</style>
+<img id="banner" src="static/img/banner.png">
+<script>
+  var host = location.origin.replace(/^http/, 'ws')
+  var ws = new WebSocket(host + "/websocket");
+  ws.onopen = function() {
+     ws.send("Hello, world");
+  };
+  ws.onmessage = function (evt) {
+     // alert(evt.data);
+  };
+</script>
+
+{% end %}

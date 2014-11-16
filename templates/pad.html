@@ -1,20 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>PRIMARY</title>
-  <link rel="icon" type="image/png" href="/static/img/favicon.png"/>
-  <style>
-      html, body {
-        width:  100%;
-        height: 100%;
-        margin: 0px;
-        background-color: #2D2D2D;
-      }
-  </style>
-</head>
-  <body>
-    <canvas id="pad" height="1000" width="1000"></canvas>
-    <script src="//raw.githubusercontent.com/jondavidjohn/hidpi-canvas-polyfill/master/dist/hidpi-canvas.min.js"></script>
-    <script src="/static/js/pad.js"></script>
-  </body>
-</html>
+{% extends "base.html" %}
+
+{% block body %}
+
+<canvas id="pad" height="1000" width="1000"></canvas>
+<script src="//raw.githubusercontent.com/jondavidjohn/hidpi-canvas-polyfill/master/dist/hidpi-canvas.min.js"></script>
+<script src="/static/js/pad.js"></script>
+
+{% end %}
