@@ -9,6 +9,7 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/", MainHandler),
+            (r"/pad", PadHandler),
             (r"/pair", PairHandler),
             (r"/websocket", EchoWebSocket),
         ]
@@ -28,6 +29,10 @@ class MainHandler(tornado.web.RequestHandler):
 class PairHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("pair.html")
+
+class PadHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("pad.html")
 
 class EchoWebSocket(tornado.websocket.WebSocketHandler):
     def open(self):
