@@ -11,9 +11,14 @@
       font-family: Helvetica;
     }
   </style>
+  {% block head %}
+  {% end %}
 </head>
   <body>
     {% block body %}
+    {% end %}
+    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+    {% block post-scripts %}
     {% end %}
   </body>
 </html>

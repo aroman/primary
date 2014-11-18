@@ -1,9 +1,47 @@
 {% extends "base.html" %}
 
+{% block head %}
+  <link href="/static/css/pad.css" media="all" rel="stylesheet" type="text/css" />
+{% end %}
+
 {% block body %}
+  <div id="brim-main">
+    <div id="main-msg">rotate your phone to landscape</div>
+    <canvas id="pad" height="1000" width="1000"></canvas>
+  </div>
+  <div id="brim-mask">
+    <h1>scroll down</h1>
+  </div>
+  <div id="not-ios-8">
+    <p>This demo has been designed for iOS 8.</p>
+  </div>
+{% end %}
 
-<canvas id="pad" height="1000" width="1000"></canvas>
-<script src="//raw.githubusercontent.com/jondavidjohn/hidpi-canvas-polyfill/master/dist/hidpi-canvas.min.js"></script>
-<script src="/static/js/pad.js"></script>
+{% block post-scripts %}
+  <script src="/static/js/vendor/brim.min.js"></script>
+  <script src="/static/js/vendor/scream.min.js"></script>
+  <script src="/static/js/vendor/platform.js"></script>
+  <script>
+  var scream,
+      brim;
+  if (platform.os.family == 'iOS' && parseInt(platform.os.version, 10) > 8 || platform.ua.indexOf('like Mac OS X') != -1) {
+      scream = gajus.Scream({
+          width: {
+              portrait: 320,
+              landscape: 568
+          }
+      });
 
+      brim = gajus.Brim({
+          viewport: scream
+      });
+
+      brim.on('viewchange', function (e) {
+          document.body.className = e.viewName;
+      });
+  } else {
+      document.querySelector('#not-ios-8').style.display = 'block';
+  }
+  </script>
+  <script src="/static/js/pad.js"></script>
 {% end %}
