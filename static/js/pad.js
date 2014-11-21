@@ -23,6 +23,34 @@ var colors = [
 
 var colorIndex = 0;
 
+var canvas = $('#pad');
+var ctx = canvas[0].getContext('2d');
+
+ctx.canvas.width = window.innerWidth * devicePixelRatio;
+ctx.canvas.height = window.innerHeight * devicePixelRatio;
+ctx.lineWidth = 10 * devicePixelRatio;
+ctx.lineCap = "round";
+ctx.strokeStyle = colors[colorIndex].hex;
+
+var scaleFactor = 60 * (ctx.canvas.width * devicePixelRatio);
+var barWidth = 10 * devicePixelRatio;
+
+function drawLevels() {
+  ctx.clearRect(0, 0, ctx.canvas.width, barWidth * colors.length);
+  colors.forEach(function (color, i) {
+      ctx.fillStyle = color.hex;
+      ctx.globalAlpha = 0.3;
+      ctx.fillRect(0, i * barWidth, ctx.canvas.width * color.max, barWidth);
+      ctx.globalAlpha = 1;
+      ctx.fillRect(0, i * barWidth, ctx.canvas.width * color.current, barWidth);
+  });
+}
+
+ctx.fillStyle = "#666";
+var bottomHeight = 40 * devicePixelRatio;
+ctx.fillRect(0, ctx.canvas.height - bottomHeight, ctx.canvas.width, bottomHeight);
+
+drawLevels();
 
 // Touch Events handlers
 var draw = {
@@ -30,7 +58,6 @@ var draw = {
   started: false,
 
   start: function(event) {
-    console.log(event);
     if (event.originalEvent.touches.length == 2) {
       colorIndex += 1;
       if (colorIndex >= colors.length) {
@@ -60,8 +87,7 @@ var draw = {
         +
         Math.pow(this.prevX - x, 2)
       ) * Math.PI * ctx.lineWidth;
-      this.distance += newDistance;
-      colors[colorIndex].current -= (newDistance / SCALE_FACTOR); 
+      colors[colorIndex].current -= (newDistance / scaleFactor); 
     }
     this.prevX = x;
     this.prevY = y;
@@ -73,41 +99,32 @@ var draw = {
   end: function(event) {
     this.started = false;
     this.prevX = this.prevY = null;
-    this.distance = 0;
   }
 
 };
-
-var canvas = $('#pad');
-var ctx = canvas[0].getContext('2d');
-
-ctx.canvas.width = window.innerWidth * devicePixelRatio;
-ctx.canvas.height = window.innerHeight * devicePixelRatio;
-ctx.lineWidth = 10 * devicePixelRatio;
-ctx.lineCap = "round";
-ctx.strokeStyle = colors[colorIndex].hex;
 
 // Touch events
 canvas.on('touchstart', draw.start);
 canvas.on('touchend', draw.end);
 canvas.on('touchmove', draw.move);
 
-var SCALE_FACTOR = 60 * (ctx.canvas.width * devicePixelRatio);
+function handleOrientation() {
 
-var barWidth = 10 * devicePixelRatio;
-function drawLevels() {
-  ctx.clearRect(0, 0, ctx.canvas.width, barWidth * colors.length);
-  for (var i = 0; i < colors.length; i++) {
-    var c = colors[i];
-    ctx.fillStyle = c.hex;
-    ctx.globalAlpha = 0.3;
-    ctx.fillRect(0, i * barWidth, ctx.canvas.width * c.max, barWidth);
-    ctx.globalAlpha = 1.0;
-    ctx.fillRect(0, i * barWidth, ctx.canvas.width * c.current, barWidth);
-  };
+  ctx.font="40px Helvetica";
+  ctx.fillStyle = "white"; 
+  ctx.fillText("orientation: " + window.orientation, 30, ctx.canvas.height - 30);
+  if (window.orientation == 0) {
+    $("#main-msg").show();
+    $("#pad").hide();
+  } else {
+    $("#main-msg").hide();
+    !scream.isMinimalView() && $("#pad").show();
+  }
 }
 
-drawLevels();
+$(window).on('orientationchange', handleOrientation);
+
+handleOrientation();
 
 // Disable Page Move
 $('body').on('touchmove', function(event) {
@@ -115,22 +132,3 @@ $('body').on('touchmove', function(event) {
     event.preventDefault();
   }
 });
-
-// Listen for orientation changes
-$(window).on('orientationchange', function() {
-  if (window.orientation === 0) {
-    $("#main-msg").show();
-    $("#pad").hide();
-  } else {
-    $("#main-msg").hide();
-    $("#pad").show();
-  }
-});
-
-if (window.orientation === 0) {
-  $("#main-msg").show();
-  $("#pad").hide();
-} else {
-  $("#main-msg").hide();
-  !scream.isMinimalView() && $("#pad").show();
-}
