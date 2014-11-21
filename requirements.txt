@@ -1,5 +1,5 @@
 Pillow==2.6.1
 certifi==14.05.14
-facebook-sdk==1.0.0-alpha
+git+https://github.com/pythonforfacebook/facebook-sdk.git@b4b2c79492369447b05276849146b9f710e114fb#egg=facebook-sdk
 requests==2.4.3
 tornado==4.0.2
