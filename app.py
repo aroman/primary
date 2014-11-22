@@ -11,6 +11,7 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/", MainHandler),
+            (r"/privacy", PrivacyHandler),
             (r"/pad", PadHandler),
             (r"/pair", PairHandler),
             (r"/websocket", EchoWebSocket),
@@ -27,6 +28,10 @@ class Application(tornado.web.Application):
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
         self.render("index.html")
+
+class PrivacyHandler(tornado.web.RequestHandler):
+    def get(self):
+        self.render("privacy.html")
 
 class PairHandler(tornado.web.RequestHandler):
     def get(self):
