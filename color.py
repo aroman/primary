@@ -1,7 +1,6 @@
 from PIL import Image
 
-def evaluate(uri):
-	img = Image.open(Ellipsis)
+def colorize(image):
 
 	# TODO: Implement Joe's suggestion, which was 
 	# to replace whiteish/blackish functions with
@@ -10,29 +9,30 @@ def evaluate(uri):
 	# indicating a gray-ish value, which covers
 	# both cases and is also inherently desirable.
 
-	def isBlackish(r, g, b):
+	def isBlackish(r, g, b, a):
 		return r < 25 and g < 25 and b < 25
 
-	def isWhiteish(r, g, b):
+	def isWhiteish(r, g, b, a):
 		return r > 200 and g > 200 and b > 200
 
-	def isBlue(r, g, b):
+	def isBlue(r, g, b, a):
 		return b > (r + g) * 0.65
 
-	def isGreen(r, g, b):
+	def isGreen(r, g, b, a):
 		return g > (r + b) * 0.55
 
-	def isRed(r, g, b):
-		return r > (g + b) * 0.60
+	def isRed(r, g, b, a):
+		return r > (g + b) * 0.65
 
 	newImgData = []
-	(width, height) = img.size
+	transparentPixel = (255, 255, 255, 0)
+	(width, height) = image.size
 	rSum = gSum = bSum = 0
 	for y in range(height):
 		for x in range(width):
-			pixel = img.getpixel((x,y))
+			pixel = image.getpixel((x,y))
 			if isBlackish(*pixel) or isWhiteish(*pixel):
-				newImgData.append(pixel)
+				newImgData.append(transparentPixel)
 			elif isBlue(*pixel):
 				bSum += 1
 				newImgData.append((0, 0, 255))
@@ -43,10 +43,19 @@ def evaluate(uri):
 				rSum += 1
 				newImgData.append((255, 0, 0))
 			else:
-				newImgData.append(pixel)
+				newImgData.append(transparentPixel)
 
 	total = rSum + gSum + bSum
-	print (rSum / total, gSum / total, bSum / total)
 
-	newImg = Image.new(img.mode, img.size)
+	print("making new iamge with mode", image.mode)
+	newImg = Image.new(image.mode, image.size)
 	newImg.putdata(newImgData)
+
+	return {
+		'img': newImg,
+		'levels': {
+			'red': rSum / total,
+			'green': gSum / total,
+			'blue': bSum / total
+		}
+	}
