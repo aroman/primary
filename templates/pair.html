@@ -26,6 +26,7 @@
 
 <form method="POST">
   <input type="text" name="access_token">
+  <input type="text" name="expires_in">
 </form>
 
 {% end %}
@@ -37,19 +38,17 @@
   $("#taptologin").on('click', function(event) {
     FB.login(function(response) {
       if (response.authResponse) {
-          console.log('Welcome!  Fetching your information.... ');
           console.log(response); // dump complete info
-          access_token = response.authResponse.accessToken; // get access token
-          user_id = response.authResponse.userID; //get FB UID
-          postToken(access_token);
+          postToken(response.authResponse);
       } else {
           alert("Why'd you cancel?")
       }
     }, {scope: 'public_profile,user_photos'});
   });
 
-  function postToken(access_token) {
-    $("input[name=access_token]").val(access_token);
+  function postToken(authResponse) {
+    $("input[name=access_token]").val(authResponse.accessToken);
+    $("input[name=expires_in]").val(authResponse.expiresIn);
     $('form').submit();
   }
 
@@ -68,7 +67,7 @@
     FB.getLoginStatus(function(response) {
       console.log(response);
       if (response.status === "connected") {
-        postToken(response.authResponse.accessToken);
+        postToken(response.authResponse);
       }
     });
   };
