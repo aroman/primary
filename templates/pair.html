@@ -12,8 +12,8 @@
       right: 0px;
       margin: 10%;
   }
-  #fbicon {
-    width: 100%;
+  form {
+    display: none;
   }
 </style>
 {% end %}
@@ -23,6 +23,10 @@
 <div id="taptologin">
   <img id="fbicon" src="/static/img/taptologin.svg">
 </div>
+
+<form method="POST">
+  <input type="text" name="access_token">
+</form>
 
 {% end %}
 
@@ -35,14 +39,19 @@
       if (response.authResponse) {
           console.log('Welcome!  Fetching your information.... ');
           console.log(response); // dump complete info
-          access_token = response.authResponse.accessToken; //get access token
+          access_token = response.authResponse.accessToken; // get access token
           user_id = response.authResponse.userID; //get FB UID
-          console.log(access_token);
+          postToken(access_token);
       } else {
           alert("Why'd you cancel?")
       }
     }, {scope: 'public_profile,user_photos'});
   });
+
+  function postToken(access_token) {
+    $("input[name=access_token]").val(access_token);
+    $('form').submit();
+  }
 
   // This function is called when someone finishes with the Login
   // Button.  See the onlogin handler attached to it in the sample
@@ -58,6 +67,9 @@
     });
     FB.getLoginStatus(function(response) {
       console.log(response);
+      if (response.status === "connected") {
+        postToken(response.authResponse.accessToken);
+      }
     });
   };
 

@@ -34,6 +34,8 @@ class PrivacyHandler(tornado.web.RequestHandler):
         self.render("privacy.html")
 
 class PairHandler(tornado.web.RequestHandler):
+    def post(self):
+        self.write(self.get_argument("access_token"))
     def get(self):
         self.render("pair.html")
 
