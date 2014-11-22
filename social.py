@@ -1,8 +1,19 @@
 import facebook
+import sys
+from pprint import pprint as pp
 
-graph = facebook.GraphAPI("CAAMObALb0uMBAMF4VcR9ZB4ZBYKn8xogZAi36WGYiiJHSKI40Nk8IOgfazrvbtYzwZCt8bBTu6SjPovaoz2pLM3VL4tPNzS3QwAEe4K0pvUeeH0tOGQojeHyAZBxjO4w4WXwUHbOCKjmr2MMrBAoAjX9ZBQilVFYQnNtmlXtabPZAhyKgGHMEtqHHOCpvHrAH3eA1sKb6G6X5E9b18o6fbIdd46RsKfe3UZD", version="1.0")
-profile = graph.get_object("me/friends")
-friends = graph.get_connections("me", "friends")
+graph = facebook.GraphAPI(sys.argv[1])
 
-print(profile)
-print(friends)
+def getPhotoIds(after=None):
+    photoIds = []
+    # Don't pass the 'after' kwarg at all if it's not set
+    extraArgs = {'after': after} if after else {}
+    res = graph.get_connections("me", "photos", fields="id", limit=10, **extraArgs)
+    # If there's more data to fetch, fetch it (recursively)
+    if 'paging' in res.keys():
+        photoIds += getPhotoIds(after=res['paging']['cursors']['after'])
+    for photo in res['data']:
+        photoIds.append(photo['id'])
+    return photoIds
+
+pp(getPhotoIds())
