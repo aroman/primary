@@ -65,7 +65,7 @@
       version    : 'v2.2' // use version 2.1
     });
     FB.getLoginStatus(function(response) {
-      console.log(response);
+      console.log(response.authResponse.access_token);
       if (response.status === "connected") {
         postToken(response.authResponse);
       }

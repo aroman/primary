@@ -47,15 +47,12 @@ def colorize(image):
 
 	total = rSum + gSum + bSum
 
-	print("making new iamge with mode", image.mode)
+	print("making new image with mode", image.mode)
 	newImg = Image.new(image.mode, image.size)
 	newImg.putdata(newImgData)
 
-	return {
-		'img': newImg,
-		'levels': {
-			'red': rSum / total,
-			'green': gSum / total,
-			'blue': bSum / total
-		}
-	}
+	return (newImg, {
+		'red': rSum / total,
+		'green': gSum / total,
+		'blue': bSum / total
+	})

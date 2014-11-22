@@ -20,19 +20,4 @@
   </style>
   <img id="banner" src="static/img/banner.png">
   <a id="start" href="/pair">Start game!</a>
-  <script>
-    var host = location.origin.replace(/^http/, 'ws')
-    var ws = new WebSocket(host + "/websocket");
-    ws.onopen = function() {
-       ws.send("Hello, world");
-    };
-    ws.onmessage = function (evt) {
-       // alert(evt.data);
-    };
-    // $("#start").on('click', function (event) {
-
-    //   event.preventDefault();
-    // });
-  </script>
-
 {% end %}
