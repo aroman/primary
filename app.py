@@ -104,7 +104,6 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
         self.update_state()
 
     def on_message(self, message):
-        print("got message:", message)
         if message == "getimg":
             self.write_message({
                 "A": self.opponent.getRandomPhoto(),
