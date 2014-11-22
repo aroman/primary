@@ -35,6 +35,6 @@ class Player(object):
         orig.save("./static/generated/" + randomId + ".png")
         overlay.save("./static/generated/" + randomId + "-overlay.png")
         return {
-            "orig": randomId,
+            "id": randomId,
             "levels": levels
         }
