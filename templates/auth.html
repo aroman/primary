@@ -38,36 +38,23 @@
   $("#taptologin").on('click', function(event) {
     FB.login(function(response) {
       if (response.authResponse) {
-          console.log(response); // dump complete info
-          postToken(response.authResponse);
+          window.location.reload();
       } else {
           alert("Why'd you cancel?")
       }
     }, {scope: 'public_profile,user_photos'});
   });
 
-  function postToken(authResponse) {
-    $("input[name=access_token]").val(authResponse.accessToken);
-    $("input[name=expires_in]").val(authResponse.expiresIn);
-    $('form').submit();
-  }
-
-  // This function is called when someone finishes with the Login
-  // Button.  See the onlogin handler attached to it in the sample
-  // code below.
-
   window.fbAsyncInit = function() {
     FB.init({
       appId      : '1557570384475065',
       cookie     : true,  // enable cookies to allow the server to access 
                           // the session
-      xfbml      : true,  // parse social plugins on this page
       version    : 'v2.2' // use version 2.1
     });
     FB.getLoginStatus(function(response) {
-      console.log(response.authResponse.access_token);
       if (response.status === "connected") {
-        postToken(response.authResponse);
+        window.location.reload();
       }
     });
   };

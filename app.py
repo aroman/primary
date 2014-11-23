@@ -2,13 +2,17 @@ import os
 import enum
 import datetime
 
+# import pymongo
 import asyncio
+import facebook
 import tornado.web
 import tornado.options
 import tornado.websocket
 import tornado.platform.asyncio
 
 from player import Player
+
+# db = pymongo.MongoClient('mongodb://primary:carpediem@ds053370.mongolab.com:53370/primary')
 
 @enum.unique
 class GameState(enum.Enum):
@@ -25,8 +29,9 @@ class Application(tornado.web.Application):
             (r"/", MainHandler),
             (r"/privacy", PrivacyHandler),
             (r"/pad", PadHandler),
-            (r"/pair", PairHandler),
+            (r"/auth", AuthHandler),
             (r"/socket", WebSocketHandler),
+            (r"/colorize", ColorizeHandler),
         ]
 
         self.players = {}
@@ -36,41 +41,63 @@ class Application(tornado.web.Application):
             template_path=os.path.join(os.path.dirname(__file__), "templates"),
             static_path=os.path.join(os.path.dirname(__file__), "static"),
             cookie_secret="C4RP3D13M",
-            debug=True
+            debug=True,
+            login_url="/auth"
         )
 
         super().__init__(handlers, **settings)
 
-class MainHandler(tornado.web.RequestHandler):
+
+FB_APP_ID = "1557570384475065"
+FB_APP_SECRET = "fe096dedfe43239f31fbe39f7ed7300e"
+
+class BaseHandler(tornado.web.RequestHandler):
+
+    def get_current_user(self):
+        access_token = self.get_cookie("access_token")
+        # If the user hasn't been logged in yet
+        if not access_token: return None
+        # If they have, return their profile
+        graph = facebook.GraphAPI(access_token)
+        profile = graph.get_object("me")
+        return profile
+
+class MainHandler(BaseHandler):
 
     def get(self):
         self.render("index.html")
 
-class PrivacyHandler(tornado.web.RequestHandler):
+class PrivacyHandler(BaseHandler):
 
     def get(self):
         self.render("privacy.html")
 
-class PairHandler(tornado.web.RequestHandler):
+class ColorizeHandler(BaseHandler):
 
-    def post(self):
-        access_token = self.get_argument("access_token")
-        expires_in = int(self.get_argument("expires_in"))
-        signed_value = self.create_signed_value("access_token", access_token)
-        expires = datetime.datetime.utcnow() + datetime.timedelta(seconds=expires_in)
-        self.set_cookie("access_token", signed_value, expires=expires)
+    @tornado.web.authenticated
+    def get(self):
+        print(self.current_user)
         self.render("color.html")
 
-    def get(self):
-        if self.get_secure_cookie("access_token"):
-            self.render("color.html")
-        else:
-            self.render("pair.html")
+class PadHandler(BaseHandler):
 
-class PadHandler(tornado.web.RequestHandler):
-
+    @tornado.web.authenticated
     def get(self):
         self.render("pad.html")
+
+class AuthHandler(BaseHandler):
+
+    def get(self):
+        cookies = dict((n, self.cookies[n].value) for n in self.cookies.keys())
+        user = facebook.get_user_from_cookie(cookies, FB_APP_ID, FB_APP_SECRET)
+        if user:
+            graph = facebook.GraphAPI(user['access_token'])
+            res = graph.extend_access_token(FB_APP_ID, FB_APP_SECRET)
+            self.set_cookie('access_token', res['access_token'])
+            self.redirect("/colorize")
+        else:
+            self.render("auth.html")
+
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
@@ -95,7 +122,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                 return self.application.players[socket]
 
     def open(self):
-        access_token = self.get_secure_cookie("access_token")
+        access_token = self.get_cookie("access_token")
+        print("access_token in WebSocketHandler", access_token)
         self.application.players[self] = Player(access_token)
         self.update_state()
 
@@ -118,4 +146,5 @@ if __name__ == "__main__":
     else:
         port = 8888
     Application().listen(port)
+    print("PRIMARY listening on port", port)
     asyncio.get_event_loop().run_forever()
