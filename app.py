@@ -2,7 +2,7 @@ import os
 import enum
 import datetime
 
-# import pymongo
+import pymongo
 import asyncio
 import facebook
 import tornado.web
@@ -10,9 +10,8 @@ import tornado.options
 import tornado.websocket
 import tornado.platform.asyncio
 
-from player import Player
-
-# db = pymongo.MongoClient('mongodb://primary:carpediem@ds053370.mongolab.com:53370/primary')
+from liaison import Liaison
+db = pymongo.MongoClient('mongodb://primary:carpediem@ds053370.mongolab.com:53370/primary').primary
 
 @enum.unique
 class GameState(enum.Enum):
@@ -54,13 +53,12 @@ FB_APP_SECRET = "fe096dedfe43239f31fbe39f7ed7300e"
 class BaseHandler(tornado.web.RequestHandler):
 
     def get_current_user(self):
-        access_token = self.get_cookie("access_token")
-        # If the user hasn't been logged in yet
-        if not access_token: return None
-        # If they have, return their profile
-        graph = facebook.GraphAPI(access_token)
-        profile = graph.get_object("me")
-        return profile
+        user = self.get_secure_cookie("user")
+        # If the user is not logged in
+        if not user: return None
+        # If they have, return their liasion
+        player = db.players.find_one({"_id": user.decode("utf-8")})
+        return Liaison(db, player)
 
 class MainHandler(BaseHandler):
 
@@ -76,7 +74,6 @@ class ColorizeHandler(BaseHandler):
 
     @tornado.web.authenticated
     def get(self):
-        print(self.current_user)
         self.render("color.html")
 
 class PadHandler(BaseHandler):
@@ -93,13 +90,18 @@ class AuthHandler(BaseHandler):
         if user:
             graph = facebook.GraphAPI(user['access_token'])
             res = graph.extend_access_token(FB_APP_ID, FB_APP_SECRET)
-            self.set_cookie('access_token', res['access_token'])
+            player = {
+                '_id': user['uid'],
+                'access_token': res['access_token']
+            }
+            db.players.save(player)
+            self.set_secure_cookie('user', user['uid'])
             self.redirect("/colorize")
         else:
             self.render("auth.html")
 
+class WebSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
 
-class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
     def broadcast(self, message):
         for socket in self.application.players.keys():
@@ -122,9 +124,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
                 return self.application.players[socket]
 
     def open(self):
-        access_token = self.get_cookie("access_token")
-        print("access_token in WebSocketHandler", access_token)
-        self.application.players[self] = Player(access_token)
+        if not self.current_user:
+            print("YOU SHOULD NOT SEE THIS AT ALL!!! UNWANTED SOCKET!!")
+            raise
+        self.application.players[self] = self.current_user
         self.update_state()
 
     def on_close(self):
@@ -134,8 +137,8 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
     def on_message(self, message):
         if message == "getimg":
             self.write_message({
-                "A": self.opponent.getRandomPhoto(),
-                "B": self.opponent.getRandomPhoto()
+                "A": self.opponent.getRandomPhoto()
+                # "B": self.opponent.getRandomPhoto()
             })
 
 if __name__ == "__main__":
