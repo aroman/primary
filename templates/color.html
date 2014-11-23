@@ -26,17 +26,17 @@
     ws.onmessage = function (evt) {
       console.log(evt);
       msg = JSON.parse(evt.data);
-      if ("A" in msg) {
+      if ("images" in msg) {
         console.log(msg);
-        
-        console.log("YEA!!!!!");
-        $("#compare").html(JSON.stringify(msg.A.levels));
-        $("#compare").after('<img src="/static/generated/' + msg.A.id + '.png"></img>');
-        $("#compare").after('<img src="/static/generated/' + msg.A.id + '-overlay.png"></img>');
+        msg.images.forEach(function (image) {
+          $("#compare").after(JSON.stringify(image.levels));
+          $("#compare").after('<img src="/static/generated/' + image.id + '.png"></img>');
+          $("#compare").after('<img src="/static/generated/' + image.id + '-overlay.png"></img>');
+        });
       }
       if (msg.state == "in_colorize") {
         $("h1").text("Ready!");
-        ws.send("getimg");
+        ws.send("get_images");
       }
       else if (msg.state == "wait_for_pair") {
         $("h1").text("Waiting for other player");

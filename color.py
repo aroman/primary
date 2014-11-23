@@ -51,8 +51,18 @@ def colorize(image):
 	newImg = Image.new(image.mode, image.size)
 	newImg.putdata(newImgData)
 
-	return (newImg, {
-		'red': rSum / total,
-		'green': gSum / total,
-		'blue': bSum / total
-	})
+	# image was grayscale
+	if total == 0:
+		levels = {
+			'red': 0,
+			'green': 0,
+			'blue': 0
+		}
+	else:
+		levels = {
+			'red': rSum / total,
+			'green': gSum / total,
+			'blue': bSum / total
+		}
+
+	return (newImg, levels)

@@ -1,9 +1,10 @@
 import os
 import enum
-import datetime
+import logging
 
 import pymongo
 import asyncio
+import colorama
 import facebook
 import tornado.web
 import tornado.options
@@ -11,6 +12,7 @@ import tornado.websocket
 import tornado.platform.asyncio
 
 from liaison import Liaison
+
 db = pymongo.MongoClient('mongodb://primary:carpediem@ds053370.mongolab.com:53370/primary').primary
 
 @enum.unique
@@ -102,7 +104,6 @@ class AuthHandler(BaseHandler):
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
 
-
     def broadcast(self, message):
         for socket in self.application.players.keys():
             socket.write_message(message)
@@ -124,8 +125,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
                 return self.application.players[socket]
 
     def open(self):
-        if not self.current_user:
-            print("YOU SHOULD NOT SEE THIS AT ALL!!! UNWANTED SOCKET!!")
+        # sanity checks
+        if not self.current_user or len(self.application.players) >= 2:
+            logging.critical("YOU SHOULD NOT SEE THIS AT ALL!!! UNWANTED SOCKET!!")
             raise
         self.application.players[self] = self.current_user
         self.update_state()
@@ -135,10 +137,10 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
         self.update_state()
 
     def on_message(self, message):
-        if message == "getimg":
+        logging.debug("websocket@{} message: {}".format(id(self), repr(message)))
+        if message == "get_images":
             self.write_message({
-                "A": self.opponent.getRandomPhoto()
-                # "B": self.opponent.getRandomPhoto()
+                "images": [self.opponent.getRandomPhoto() for _ in range(1)]
             })
 
 if __name__ == "__main__":
@@ -149,5 +151,12 @@ if __name__ == "__main__":
     else:
         port = 8888
     Application().listen(port)
-    print("PRIMARY listening on port", port)
+    (R, G, B, X) = (
+        colorama.Fore.RED,
+        colorama.Fore.GREEN,
+        colorama.Fore.BLUE,
+        colorama.Fore.RESET
+    )
+    logging.info(R + "PRI" + G + "MA" + B + "RY" + X + 
+        " listening on http://127.0.0.1:" + str(port) + X)
     asyncio.get_event_loop().run_forever()
