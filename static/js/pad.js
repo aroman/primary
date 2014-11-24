@@ -52,6 +52,20 @@ ctx.fillRect(0, ctx.canvas.height - bottomHeight, ctx.canvas.width, bottomHeight
 
 drawLevels();
 
+
+currentMove = {
+  start: {
+    x: null,
+    y: null
+  },
+  end: {
+    x: null,
+    y: null
+  }
+},
+
+console.log(currentMove);
+
 // Touch Events handlers
 var draw = {
 
@@ -67,11 +81,13 @@ var draw = {
     } else {
       this.distance = 0;
       ctx.beginPath();
-      ctx.moveTo(
-        event.originalEvent.touches[0].pageX * devicePixelRatio,
-        (event.originalEvent.touches[0].pageY - $("body").scrollTop()) * devicePixelRatio
-      );
+      var x = event.originalEvent.touches[0].pageX * devicePixelRatio;
+      var y = (event.originalEvent.touches[0].pageY - $("body").scrollTop()) * devicePixelRatio;
+      ctx.moveTo(x, y);
       this.started = true;
+      console.log(currentMove)
+      currentMove.start.x = x;
+      currentMove.start.y = y;
     }
   },
 
@@ -92,6 +108,9 @@ var draw = {
     this.prevX = x;
     this.prevY = y;
     ctx.lineTo(x, y);
+    currentMove.end.x = x;
+    currentMove.end.y = y;
+    socket.send(JSON.stringify({move: currentMove}));
     ctx.stroke();
     drawLevels();
   },
@@ -102,6 +121,10 @@ var draw = {
   }
 
 };
+
+// Connect websocket
+var host = location.origin.replace(/^http/, 'ws')
+var socket = new WebSocket(host + "/socket/player");
 
 // Touch events
 canvas.on('touchstart', draw.start);

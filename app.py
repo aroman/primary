@@ -1,4 +1,5 @@
 import os
+import json
 import enum
 import logging
 
@@ -28,14 +29,17 @@ class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/", MainHandler),
-            (r"/privacy", PrivacyHandler),
             (r"/pad", PadHandler),
             (r"/auth", AuthHandler),
-            (r"/socket", WebSocketHandler),
+            (r"/board", BoardHandler),
+            (r"/socket/player", PlayerSocketHandler),
+            (r"/socket/board", BoardSocketHandler),
+            (r"/privacy", PrivacyHandler),
             (r"/colorize", ColorizeHandler),
         ]
 
         self.players = {}
+        self.board = None
         self.state = GameState.wait_for_player
 
         settings = dict(
@@ -92,6 +96,11 @@ class PadHandler(BaseHandler):
     def get(self):
         self.render("pad.html")
 
+class BoardHandler(BaseHandler):
+
+    def get(self):
+        self.render("board.html")
+
 class AuthHandler(BaseHandler):
 
     def get(self):
@@ -110,7 +119,7 @@ class AuthHandler(BaseHandler):
         else:
             self.render("auth.html")
 
-class WebSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
+class PlayerSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
 
     def broadcast(self, message):
         for socket in self.application.players.keys():
@@ -133,6 +142,9 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
                 return self.application.players[socket]
 
     def open(self):
+        logging.debug("PlayerSocket@{} opened".format(id(self)))
+        logging.debug("WebSocket")
+        print(self.request.__dict__)
         # sanity checks
         if not self.current_user or len(self.application.players) >= 2:
             logging.error("YOU SHOULD NOT SEE THIS AT ALL!!! UNWANTED SOCKET!!")
@@ -145,11 +157,33 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
         self.update_state()
 
     def on_message(self, message):
-        logging.debug("websocket@{} message: {}".format(id(self), repr(message)))
+        logging.debug("PlayerSocket@{} message: {}".format(id(self), repr(message)))
         if message == "get_images":
             self.write_message({
                 "images": [self.opponent.getRandomPhoto() for _ in range(2)]
             })
+        else:
+            if not self.application.board: return
+            print("writing!")
+            self.application.board.write_message(message)
+
+class BoardSocketHandler(tornado.websocket.WebSocketHandler):
+
+    def open(self):
+        logging.debug("BoardSocket@{} opened".format(id(self)))
+        logging.debug("WebSocket")
+        self.application.board = self
+
+    def on_close(self):
+        self.application.board = None
+
+    def on_message(self, message):
+        logging.debug("BoardSocket@{} message: {}".format(id(self), repr(message)))
+        # if message == "move":
+
+        #     self.write_message({
+        #         "images": [self.opponent.getRandomPhoto() for _ in range(2)]
+        #     })
 
 if __name__ == "__main__":
     tornado.platform.asyncio.AsyncIOMainLoop().install()
