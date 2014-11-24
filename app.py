@@ -75,8 +75,16 @@ class PrivacyHandler(BaseHandler):
 class ColorizeHandler(BaseHandler):
 
     @tornado.web.authenticated
+    def post(self):
+        self.render("pad.html", levels={
+            'red': self.get_argument("red"),
+            'green': self.get_argument("green"),
+            'blue': self.get_argument("blue"),
+        })
+
+    @tornado.web.authenticated
     def get(self):
-        self.render("color.html")
+        self.render("colorize.html")
 
 class PadHandler(BaseHandler):
 
@@ -127,7 +135,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
     def open(self):
         # sanity checks
         if not self.current_user or len(self.application.players) >= 2:
-            logging.critical("YOU SHOULD NOT SEE THIS AT ALL!!! UNWANTED SOCKET!!")
+            logging.error("YOU SHOULD NOT SEE THIS AT ALL!!! UNWANTED SOCKET!!")
             raise
         self.application.players[self] = self.current_user
         self.update_state()
@@ -140,7 +148,7 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
         logging.debug("websocket@{} message: {}".format(id(self), repr(message)))
         if message == "get_images":
             self.write_message({
-                "images": [self.opponent.getRandomPhoto() for _ in range(1)]
+                "images": [self.opponent.getRandomPhoto() for _ in range(2)]
             })
 
 if __name__ == "__main__":

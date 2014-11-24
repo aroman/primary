@@ -22,6 +22,7 @@
   <script src="/static/js/vendor/scream.min.js"></script>
   <script src="/static/js/vendor/platform.js"></script>
   <script>
+  var levels = {% raw json_encode(levels) %};
   var scream,
       brim;
   if (platform.os.family == 'iOS' && parseInt(platform.os.version, 10) > 8 || platform.ua.indexOf('like Mac OS X') != -1) {

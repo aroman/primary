@@ -47,10 +47,9 @@
 
   window.fbAsyncInit = function() {
     FB.init({
-      appId      : '1557570384475065',
-      cookie     : true,  // enable cookies to allow the server to access 
-                          // the session
-      version    : 'v2.2' // use version 2.1
+      appId: '1557570384475065',
+      cookie: true,
+      version: 'v2.2'
     });
     FB.getLoginStatus(function(response) {
       if (response.status === "connected") {

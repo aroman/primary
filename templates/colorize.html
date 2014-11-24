@@ -1,0 +1,158 @@
+{% extends "base.html" %}
+
+{% block head %}
+<style>
+  h1 {
+    font-family: monospace;
+  }
+  #compare {
+    /*display: block;*/
+    /*margin-left: auto;*/
+    /*margin-right: auto;*/
+    /*text-align: center;*/
+  }
+  .choice:first-child {
+    float: left;
+  }
+  .choice:last-child {
+    float: right;
+  }
+  .image {
+    width: 400px;
+    height: 400px;
+    border-radius: 10px;
+  }
+  .image-overlay {
+    display: none;
+  }
+</style>
+{% end %}
+
+{% block body %}
+  <div id="main">
+    <form method="POST">
+      <input type="hidden" name="red">
+      <input type="hidden" name="green">
+      <input type="hidden" name="blue">
+    </form>
+    <h1>connecting...</h1>
+
+    <div id="compare">
+    </div>
+  </div>
+
+  <script id="photo-template" type="text/x-mustache-template">
+    <img class="image" src="/static/generated/{{! id }}.png">
+    <img class="image image-overlay" src="/static/generated/{{! id }}-overlay.png">
+  </script>
+{% end %}
+
+{% block post-scripts %}
+<script src="/static/js/vendor/hogan.js"></script>
+<script src="/static/js/vendor/underscore.min.js"></script>
+<script src="/static/js/vendor/backbone.min.js"></script>
+<script>
+
+    var PhotoModel = Backbone.Model.extend({
+
+    });
+
+    var PhotoView = Backbone.View.extend({
+
+      className: "choice",
+
+      events: {
+        "click img": "select",
+      },
+
+      initialize: function(options) {
+        this.template = Hogan.compile($("#photo-template").html());
+      },
+
+      select: function() {
+        this.$(".image").hide();
+        this.$(".image-overlay").show();
+        console.log("clicked image with id", this.model.get('id'));
+        var levels = this.model.get('levels');
+        $("input[name=red]").val(levels.red);
+        $("input[name=green]").val(levels.green);
+        $("input[name=blue]").val(levels.blue);
+
+        setTimeout(function () {
+          $("form").submit();
+        }, 2000);
+      },
+
+      render: function() {
+        console.log(this.model);
+        var context = this.model.toJSON();
+        var html = this.template.render(context);
+        this.$el.html(html);
+        return this;
+      }
+
+    });
+
+    var ColorizeView = Backbone.View.extend({
+
+      el: $("#main"),
+
+      events: {
+
+      },
+
+      initialize: function() {
+        var host = location.origin.replace(/^http/, 'ws')
+        this.socket = new WebSocket(host + "/socket");
+        this.updateStatus("connecting...");
+
+        // Bind socket events
+        this.socket.onclose = this.onSocketClosed.bind(this);
+        this.socket.onopen = this.onSocketOpened.bind(this);
+        this.socket.onmessage = this.onSocketMessage.bind(this);
+      },
+
+      sendMessage: function(message) {
+        console.log("Sending message:", message);
+        this.socket.send(message);
+      },
+
+      onSocketOpened: function() {
+        this.updateStatus("connected :)");
+      },
+
+      onSocketClosed: function() {
+        this.updateStatus("disconnected :(");
+      },
+
+      onSocketMessage: function(event) {
+        var msg = JSON.parse(event.data);
+        if ("images" in msg) {
+          console.log(msg.images[0]);
+
+          var A = new PhotoView({model: new PhotoModel(msg.images[0])});
+          var B = new PhotoView({model: new PhotoModel(msg.images[1])});
+          this.$("#compare").append(A.render().el);
+          this.$("#compare").append(B.render().el);
+        }
+        if (msg.state == "in_colorize") {
+          this.sendMessage("get_images");
+        }
+        this.updateStatus(msg.state);
+      },
+
+      updateStatus: function(status) {
+        this.$("h1").text(status);
+      },
+
+      select: function() {
+        console.log("clicked")
+        console.log(event.target);
+        console.log($(event.target).attr('imgid'));
+      },
+
+    });
+
+    new ColorizeView();
+</script>
+{% end %}

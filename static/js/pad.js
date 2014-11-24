@@ -4,20 +4,20 @@ var colors = [
   {
     name: "red",
     hex: "#D0021B",
-    current: 1.00,
-    max: 1.00
+    current: levels.red,
+    max: levels.red
   },
   {
     name: "green",
     hex: "#7ED321",
-    current: 0.47,
-    max: 0.47
+    current: levels.green,
+    max: levels.green
   },
   {
     name: "blue",
     hex: "#4A90E2",
-    current: 0.82,
-    max: 0.82
+    current: levels.blue,
+    max: levels.blue
   }
 ];
 
