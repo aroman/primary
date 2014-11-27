@@ -6,6 +6,31 @@ var colorMap = {
   blue: "#4A90E2",
 };
 
+var colors = [
+    '#b58900',
+    '#cb4b16',
+    '#dc322f',
+    '#d33682',
+    '#6c71c4',
+    '#268bd2',
+    '#2aa198',
+    '#859900'
+];
+
+var MAX_BARRIER_WIDTH = 50 * devicePixelRatio;
+
+Physics.body('barrier', 'rectangle', function(parent) {
+  return {
+    init: function(options) {
+      options.styles = {
+        fillStyle: colors[Math.floor(Math.random() * colors.length)]
+      };
+      options.treatment = 'static';
+      parent.init.call(this, options);
+    }
+  };
+});
+
 var BoardView = Backbone.View.extend({
 
   el: $("#container"),
@@ -26,8 +51,10 @@ var BoardView = Backbone.View.extend({
     this.socket.onmessage = this.onSocketMessage.bind(this);
 
     // Set up physics stuff
-    var width = window.innerWidth ;
-    var height = window.innerHeight;
+    var width = window.innerWidth * devicePixelRatio;
+    var height = window.innerHeight * devicePixelRatio;
+    // $("#board")[0].width = window.innerWidth * 2;
+    // $("#board")[0].height = window.innerHeight * 2;
     this.world = Physics();
     this.renderer = Physics.renderer('canvas', {
       el: "board",
@@ -39,8 +66,6 @@ var BoardView = Backbone.View.extend({
         }
       }
     });
-    $("#board")[0].width = window.innerWidth;
-    $("#board")[0].height = window.innerHeight;
     this.world.add(this.renderer);
     var bounds = Physics.aabb(0, 0, width, height);
     var edgeBounce = Physics.behavior('edge-collision-detection', {
@@ -51,16 +76,6 @@ var BoardView = Backbone.View.extend({
     this.world.add(Physics.behavior('body-impulse-response'));
     this.world.add(Physics.behavior('body-collision-detection'));
     this.world.add(Physics.behavior('sweep-prune'));
-    this.world.add(Physics.behavior('interactive', {el: this.renderer.el}));
-
-
-    this.world.on('interact:grab', function( data ){
-      console.log(data);
-      data.x; // the x coord
-      data.y; // the y coord
-      data.body; // the body that was grabbed (if applicable)
-      return false;
-    });
 
     // Test object
     var square = Physics.body('circle', {
@@ -106,29 +121,49 @@ var BoardView = Backbone.View.extend({
   onSocketMessage: function(event) {
     var msg = JSON.parse(event.data);
     if (msg.type == "path") {
-      console.log(msg);
-      var distance = Math.sqrt(
-        Math.pow((msg.start.x - msg.end.x), 2)
-        +
-        Math.pow((msg.start.y - msg.end.y), 2)
-      );
-      var path = Physics.body('rectangle', {
-        x: (msg.start.x + msg.end.x) / 2,
-        y: (msg.start.y + msg.end.y) / 2,
-        width: distance + devicePixelRatio,
-        height: 10,
-        treatment: 'static',
-      });
-
-      // Rotate it
-      var adjacent = msg.start.x - msg.end.x;
-      if (msg.end.y > msg.start.y) {
-        adjacent = -adjacent;
-      }
-      path.state.angular.pos = Math.acos(adjacent / distance);
-
-      this.world.add(path);
+      this.createBarrier(msg.start, msg.end, msg.color);
     }
+  },
+
+  // start -> {x: Number, y: Number}
+  // end -> {x: Number, y: Number}
+  // color -> String
+  createBarrier: function(start, end, color) {
+    var distance = Math.sqrt(
+      Math.pow((start.x - end.x), 2)
+      +
+      Math.pow((start.y - end.y), 2)
+    );
+
+    // If the barrier is too big, split it into 
+    // two, recursively
+    if (distance > MAX_BARRIER_WIDTH) {
+      var midPoint = {
+        x: (start.x + end.x) / 2,
+        y: (start.y + end.y) / 2
+      }
+      this.createBarrier(start, midPoint, color);
+      this.createBarrier(midPoint, end, color);
+      return;
+    }
+
+    // Create static body
+    var path = Physics.body('barrier', {
+      x: (start.x + end.x) / 2,
+      y: (start.y + end.y) / 2,
+      width: distance + devicePixelRatio,
+      height: 10
+    });
+
+    // Rotate it
+    var adjacent = start.x - end.x;
+    if (end.y > start.y) {
+      adjacent = -adjacent;
+    }
+    path.state.angular.pos = Math.acos(adjacent / distance);
+
+    // Add it to the world
+    this.world.add(path);
   },
 
   updateStatus: function(status) {

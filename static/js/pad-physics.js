@@ -239,6 +239,9 @@ var PadView = Backbone.View.extend({
     var y = (event.clientY - $("body").scrollTop()) * devicePixelRatio;
 
     var distance = Math.sqrt(Math.pow((this.prevX - x), 2) + Math.pow((this.prevY - y), 2));
+    this.runningDistance += distance;
+    if (this.runningDistance < 500) return;
+    this.runningDistance = 0;
     var path = Physics.body('rectangle', {
       x: (this.prevX + x) / 2,
       y: (this.prevY + y) / 2,
@@ -289,7 +292,19 @@ var PadView = Backbone.View.extend({
   },
 
   onTouchMove: function() {
-    
+    if (event.touches.length > 1) {
+      return alert("multitouch not supported yet");
+    }
+    var touch = event.touches[0];
+    var x = touch.clientX * devicePixelRatio;
+    var y = (touch.clientY - $("body").scrollTop()) * devicePixelRatio;
+    var square = Physics.body('rectangle', {
+      x: x,
+      y: y,
+      width: 50,
+      height: 50
+    });
+    this.world.add(square);
   },
  
   onTouchEnd: function() {
