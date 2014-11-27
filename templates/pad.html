@@ -7,7 +7,6 @@
 {% block body %}
   <div id="brim-main">
     <div id="main-msg">rotate your phone to landscape</div>
-    <canvas id="pad" height="1000" width="1000"></canvas>
   </div>
   <div id="brim-mask">
     <h1>scroll down</h1>
@@ -44,5 +43,9 @@
       document.querySelector('#not-ios-8').style.display = 'block';
   }
   </script>
+  <script src="/static/js/vendor/hogan.js"></script>
+  <script src="/static/js/vendor/underscore.min.js"></script>
+  <script src="/static/js/vendor/backbone.min.js"></script>
+  <script src="/static/js/vendor/physicsjs-full.min.js"></script>
   <script src="/static/js/pad.js"></script>
 {% end %}

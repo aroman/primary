@@ -94,7 +94,7 @@ class PadHandler(BaseHandler):
 
     @tornado.web.authenticated
     def get(self):
-        self.render("pad.html")
+        self.render("pad-physics.html")
 
 class BoardHandler(BaseHandler):
 
@@ -155,6 +155,8 @@ class PlayerSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
     def on_close(self):
         del self.application.players[self]
         self.update_state()
+        if self.application.board:
+            self.application.board.write_message({"type": "clear"})
 
     def on_message(self, message):
         logging.debug("PlayerSocket@{} message: {}".format(id(self), repr(message)))

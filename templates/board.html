@@ -1,12 +1,26 @@
 {% extends "base.html" %}
 
 {% block head %}
-  <!-- <link href="/static/css/pad.css" media="all" rel="stylesheet" type="text/css" /> -->
+<style>
+	body {
+		margin: 0;
+    padding: 0;
+    text-align: left !important;
+	}
+	canvas {
+    /*background-color: red;*/
+    /*width: 100a%;*/
+    /*height: 100%;*/
+    /*width: 100px;*/
+    /*height: 100px*/
+	}
+</style>
+<!-- <link href="/static/css/pad.css" media="all" rel="stylesheet" type="text/css" /> -->
 {% end %}
 
 {% block body %}
-  <div id="board">
-    <canvas></canvas>
+  <div id="container">
+    <canvas id="board"></canvas>
   </div>
 {% end %}
 
@@ -14,5 +28,6 @@
   <script src="/static/js/vendor/hogan.js"></script>
   <script src="/static/js/vendor/underscore.min.js"></script>
   <script src="/static/js/vendor/backbone.min.js"></script>
+  <script src="/static/js/vendor/physicsjs-full.min.js"></script>
   <script src="/static/js/board.js"></script>
 {% end %}

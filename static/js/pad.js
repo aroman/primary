@@ -4,7 +4,7 @@ var colors = [
   {
     name: "red",
     hex: "#D0021B",
-    current: levels.red,
+    current: 100,
     max: levels.red
   },
   {
@@ -52,27 +52,24 @@ ctx.fillRect(0, ctx.canvas.height - bottomHeight, ctx.canvas.width, bottomHeight
 
 drawLevels();
 
-
-currentMove = {
-  start: {
-    x: null,
-    y: null
-  },
-  end: {
-    x: null,
-    y: null
-  }
-},
-
-console.log(currentMove);
-
 // Touch Events handlers
 var draw = {
 
   started: false,
 
   start: function(event) {
-    if (event.originalEvent.touches.length == 2) {
+    if (event.originalEvent.touches.length == 3) {
+      for (var i = colors.length - 1; i >= 0; i--) {
+        colors[i].current = 100;
+      };
+      drawLevels();
+    }
+    else if (event.originalEvent.touches.length == 4) {
+      socket.send(JSON.stringify({type: "clear"}));
+      ctx.clearRect(0, 0, canvas.width() * devicePixelRatio, canvas.height() * devicePixelRatio);
+      drawLevels();
+    }
+    else if (event.originalEvent.touches.length == 2) {
       colorIndex += 1;
       if (colorIndex >= colors.length) {
         colorIndex = 0;
@@ -85,9 +82,12 @@ var draw = {
       var y = (event.originalEvent.touches[0].pageY - $("body").scrollTop()) * devicePixelRatio;
       ctx.moveTo(x, y);
       this.started = true;
-      console.log(currentMove)
-      currentMove.start.x = x;
-      currentMove.start.y = y;
+      socket.send(JSON.stringify({
+        type: 'start',
+        color: ctx.strokeStyle,
+        x: x,
+        y: y
+      }));
     }
   },
 
@@ -108,11 +108,13 @@ var draw = {
     this.prevX = x;
     this.prevY = y;
     ctx.lineTo(x, y);
-    currentMove.end.x = x;
-    currentMove.end.y = y;
-    socket.send(JSON.stringify({move: currentMove}));
     ctx.stroke();
     drawLevels();
+    socket.send(JSON.stringify({
+      type: 'move',
+      x: x,
+      y: y
+    }));
   },
 
   end: function(event) {
