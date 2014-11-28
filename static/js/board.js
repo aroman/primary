@@ -23,9 +23,22 @@ Physics.body('barrier', 'rectangle', function(parent) {
   return {
     init: function(options) {
       options.styles = {
-        fillStyle: colors[Math.floor(Math.random() * colors.length)]
+        fillStyle: colorMap[options.color]
       };
       options.treatment = 'static';
+      parent.init.call(this, options);
+    }
+  };
+});
+
+Physics.body('ball', 'circle', function(parent) {
+  return {
+    init: function(options) {
+      options.styles = {
+        fillStyle: colorMap[options.color]
+      };
+      options.radius = 7.5 * devicePixelRatio;
+      // options.treatment = 'static';
       parent.init.call(this, options);
     }
   };
@@ -77,15 +90,18 @@ var BoardView = Backbone.View.extend({
     this.world.add(Physics.behavior('body-collision-detection'));
     this.world.add(Physics.behavior('sweep-prune'));
 
-    // Test object
-    var square = Physics.body('circle', {
-      x: 250,
-      y: 250,
-      vy: -0.25,
-      radius: 50
-    });
-    this.world.add(square);
+    ["red", "blue", "green", "green", "red", "blue", "blue"].forEach(function (color) {
+      var ball = Physics.body('ball', {
+        x: width * Math.random(),
+        y: height * Math.random(),
+        vy: 1 * Math.random(),
+        vx: -1 * Math.random(),
+        color: color
+      });
+      this.world.add(ball);
+    }, this);
 
+    this.world.on('collisions:detected', this.onCollisions.bind(this));
     this.world.on('step', this.onStep.bind(this));
     Physics.util.ticker.on(this.onTick.bind(this));
 
@@ -103,6 +119,36 @@ var BoardView = Backbone.View.extend({
 
   onStep: function() {
     this.world.render();
+  },
+
+  onCollisions: function(data) {
+    data.collisions.forEach(function handleCollision(collision) {
+      // We hit a screen boundary
+      if (!_.has(collision.bodyB, "color")) {
+        return;
+      }
+      // We hit another ball
+      if (collision.bodyB.treatment === "dynamic" && collision.bodyA.treatment === "dynamic") {
+        console.log("We hit another ball");
+      } else {
+        // Figure out which one is the ball and
+        // which one is the wall.
+        if (collision.bodyA.treatment === "static") {
+          var ball = collision.bodyB;
+          var wall = collision.bodyA;
+        } else {
+          var ball = collision.bodyA;
+          var wall = collision.bodyB;
+        }
+        // Break wall
+        if ((ball.color === 'red' && wall.color === 'green') ||
+            (ball.color === 'green' && wall.color === 'blue') ||
+            (ball.color === 'blue' && wall.color === 'red')) {
+              this.world.remove(wall);
+              this.world.remove(ball);
+        }
+      }
+    }, this);
   },
 
   sendMessage: function(message) {
@@ -152,7 +198,8 @@ var BoardView = Backbone.View.extend({
       x: (start.x + end.x) / 2,
       y: (start.y + end.y) / 2,
       width: distance + devicePixelRatio,
-      height: 10
+      height: 10,
+      color: 'blue'
     });
 
     // Rotate it
