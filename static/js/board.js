@@ -72,25 +72,21 @@ var BoardView = Backbone.View.extend({
     this.renderer = Physics.renderer('canvas', {
       el: "board",
       width: width,
-      height: height,
-      styles: {
-        'rectangle': {
-          fillStyle: "#fff"
-        }
-      }
+      height: height
     });
     this.world.add(this.renderer);
     var bounds = Physics.aabb(0, 0, width, height);
     var edgeBounce = Physics.behavior('edge-collision-detection', {
-        aabb: bounds,
-        restitution: 1
+        aabb: bounds
     });
     this.world.add(edgeBounce);
-    this.world.add(Physics.behavior('body-impulse-response'));
+    this.world.add(Physics.behavior('body-impulse-response', {
+      check: 'collisions:desired'
+    }));
     this.world.add(Physics.behavior('body-collision-detection'));
     this.world.add(Physics.behavior('sweep-prune'));
 
-    ["red", "blue", "green", "green", "red", "blue", "blue"].forEach(function (color) {
+    ["green", "red", "blue"].forEach(function (color) {
       var ball = Physics.body('ball', {
         x: width * Math.random(),
         y: height * Math.random(),
@@ -125,6 +121,7 @@ var BoardView = Backbone.View.extend({
     data.collisions.forEach(function handleCollision(collision) {
       // We hit a screen boundary
       if (!_.has(collision.bodyB, "color")) {
+        this.world.emit("collisions:desired", {collisions: [collision]});
         return;
       }
       // We hit another ball
@@ -146,6 +143,13 @@ var BoardView = Backbone.View.extend({
             (ball.color === 'blue' && wall.color === 'red')) {
               this.world.remove(wall);
               this.world.remove(ball);
+        }
+        else if (ball.color === wall.color) {
+          console.log("Pass through!");
+        }
+        else {
+          console.log("Bounce!");
+          this.world.emit("collisions:desired", {collisions: [collision]});
         }
       }
     }, this);
