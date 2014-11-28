@@ -1,20 +1,20 @@
 // Copyright 2014 Avi Romanoff <avi at romanoff.me>
 
 var colorMap = {
-  red: "#D0021B",
-  green: "#7ED321",
-  blue: "#4A90E2",
+  red: 0xD0021B,
+  green: 0x7ED321,
+  blue: 0x4A90E2,
 };
 
 var colors = [
-    '#b58900',
-    '#cb4b16',
-    '#dc322f',
-    '#d33682',
-    '#6c71c4',
-    '#268bd2',
-    '#2aa198',
-    '#859900'
+    0xb58900,
+    0xcb4b16,
+    0xdc322f,
+    0xd33682,
+    0x6c71c4,
+    0x268bd2,
+    0x2aa198,
+    0x859900
 ];
 
 var MAX_BARRIER_WIDTH = 50 * devicePixelRatio;
@@ -38,7 +38,6 @@ Physics.body('ball', 'circle', function(parent) {
         fillStyle: colorMap[options.color]
       };
       options.radius = 7.5 * devicePixelRatio;
-      // options.treatment = 'static';
       parent.init.call(this, options);
     }
   };
@@ -69,15 +68,29 @@ var BoardView = Backbone.View.extend({
     // $("#board")[0].width = window.innerWidth * 2;
     // $("#board")[0].height = window.innerHeight * 2;
     this.world = Physics();
-    this.renderer = Physics.renderer('canvas', {
-      el: "board",
+    // this.renderer = Physics.renderer('canvas', {
+    //   el: "board",
+    //   width: width,
+    //   height: height
+    // });
+    this.renderer = Physics.renderer('pixi', {
+      el: "container",
       width: width,
-      height: height
+      height: height,
+      styles: {
+        'circle': {
+            lineWidth: 3
+          },
+        'rectangle': {
+            lineWidth: 3
+          }
+        },
     });
     this.world.add(this.renderer);
     var bounds = Physics.aabb(0, 0, width, height);
     var edgeBounce = Physics.behavior('edge-collision-detection', {
-        aabb: bounds
+        aabb: bounds,
+        restitution: 1.00001
     });
     this.world.add(edgeBounce);
     this.world.add(Physics.behavior('body-impulse-response', {
@@ -86,7 +99,7 @@ var BoardView = Backbone.View.extend({
     this.world.add(Physics.behavior('body-collision-detection'));
     this.world.add(Physics.behavior('sweep-prune'));
 
-    ["green", "red", "blue"].forEach(function (color) {
+    ["green", "red","green","red","green","red","green","red","green","red","green","red","green","red","green","red","green","red","green","red","green", "red", "blue"].forEach(function (color) {
       var ball = Physics.body('ball', {
         x: width * Math.random(),
         y: height * Math.random(),
@@ -118,41 +131,54 @@ var BoardView = Backbone.View.extend({
   },
 
   onCollisions: function(data) {
-    data.collisions.forEach(function handleCollision(collision) {
+    
+    data.collisions.forEach(potentialCollision, this);
+
+    function emitCollision(collision) {
+      this.world.emit("collisions:desired", {collisions: [collision]});
+    }
+
+    function potentialCollision(collision) {
+
       // We hit a screen boundary
       if (!_.has(collision.bodyB, "color")) {
-        this.world.emit("collisions:desired", {collisions: [collision]});
+        emitCollision.call(this, collision);
         return;
       }
+
       // We hit another ball
-      if (collision.bodyB.treatment === "dynamic" && collision.bodyA.treatment === "dynamic") {
-        console.log("We hit another ball");
-      } else {
-        // Figure out which one is the ball and
-        // which one is the wall.
-        if (collision.bodyA.treatment === "static") {
-          var ball = collision.bodyB;
-          var wall = collision.bodyA;
-        } else {
-          var ball = collision.bodyA;
-          var wall = collision.bodyB;
-        }
-        // Break wall
-        if ((ball.color === 'red' && wall.color === 'green') ||
-            (ball.color === 'green' && wall.color === 'blue') ||
-            (ball.color === 'blue' && wall.color === 'red')) {
-              this.world.remove(wall);
-              this.world.remove(ball);
-        }
-        else if (ball.color === wall.color) {
-          console.log("Pass through!");
-        }
-        else {
-          console.log("Bounce!");
-          this.world.emit("collisions:desired", {collisions: [collision]});
-        }
+      if (collision.bodyB.treatment === "dynamic" &&
+          collision.bodyA.treatment === "dynamic") {
+        return;
       }
-    }, this);
+
+      // Figure out which one is the ball and
+      // which one is the wall.
+      var ball, wall;
+      if (collision.bodyA.treatment === "static") {
+        ball = collision.bodyB;
+        wall = collision.bodyA;
+      } else {
+        ball = collision.bodyA;
+        wall = collision.bodyB;
+      }
+
+      // Break wall
+      if ((ball.color === 'red' && wall.color === 'green') ||
+          (ball.color === 'green' && wall.color === 'blue') ||
+          (ball.color === 'blue' && wall.color === 'red')) {
+            this.world.remove(wall);
+            this.world.remove(ball);
+      }
+      // Pass through
+      else if (ball.color === wall.color) {
+        console.log("Pass through!");
+      }
+      // Bounce
+      else {
+        emitCollision.call(this, collision);
+      }
+    }
   },
 
   sendMessage: function(message) {

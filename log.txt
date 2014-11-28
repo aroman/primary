@@ -1,0 +1,197 @@
+commit 4b3df4c414a87010c06ae4ceb2556dc8df935bd6
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Mon Nov 24 03:02:23 2014 -0500
+
+    DEPLOYYYY
+
+commit b58ba66073ce29a0f83b672490a3b319fb00ab0d
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 23 23:10:29 2014 -0500
+
+    use my repo with patched facebook-sdk
+
+commit 3314e76896154324563823225640d07b31440b73
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 23 23:05:32 2014 -0500
+
+    facebook-sdk from git master
+
+commit bef66645dd15a33eb7c69cdc0ad47c584673707f
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 23 23:03:12 2014 -0500
+
+    wire the drawing to the images, use backbone
+
+commit 30b6f9fa70146525812e330cfa3ad57f18a5bb0f
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 23 18:26:02 2014 -0500
+
+    better logging, fix grayscale image edgecase, improve websocket flow
+
+commit ebbffaf4d11f90e2e5c5acd56d6ccde2aea1f7b0
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 23 07:41:39 2014 -0500
+
+    invent the Lazy Liaison™ pattern
+
+commit 81b49bfbacfa5c6129a63fd32071437d5aeaa3d2
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 23 06:31:37 2014 -0500
+
+    revamp facebook login flow
+
+commit 41d58b932c726e974eed84c596d9d818a092c2a0
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sat Nov 22 08:28:33 2014 -0500
+
+    fix a thing i broke
+
+commit 7c74d5a097f2fbdb35637cb61fba81172cdb65cd
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sat Nov 22 08:26:02 2014 -0500
+
+    force generated directory to exist
+
+commit 2bbb9233edcaf0cad34b1f786018dbaa847f7c10
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sat Nov 22 08:23:02 2014 -0500
+
+    forgot to commit player.py
+
+commit 31a795598c5b4902279dcb9640cce7c9267c76bb
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sat Nov 22 08:21:42 2014 -0500
+
+    flow so hard mothafuckas wanna fine me
+
+commit f7c02439f2046a41465775b76a46d45bed9db4f3
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sat Nov 22 01:24:28 2014 -0500
+
+    flow further, juggle sockets
+
+commit ccf8cd0a90dbc5fd3f5202dd11d7fb1c49eb9803
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sat Nov 22 01:05:51 2014 -0500
+
+    token forwarding
+
+commit 16c8fc0f56c0889798e3117eabc105105f90af3c
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sat Nov 22 00:49:44 2014 -0500
+
+    colors + facebook
+
+commit 020077eef7526a87386ce81c09f658af6edc72f4
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Fri Nov 21 23:08:07 2014 -0500
+
+    getPhotoIds() works
+
+commit 25e34a13ff449a114733dc7ab68e7052a88cd05f
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Fri Nov 21 21:34:38 2014 -0500
+
+    fix pairing code
+
+commit 2077b481bad620c264b2b3d24e13718845714c6d
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Fri Nov 21 20:58:46 2014 -0500
+
+    change permissions
+
+commit 9b1202974f47547c6f67f5c8cb565227ed95cb4d
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Fri Nov 21 20:53:30 2014 -0500
+
+    add privacy template, which is needed for facebook login
+
+commit 8f1dda045473fa965da565286a0401d60489ea03
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Fri Nov 21 00:29:19 2014 -0500
+
+    fuck facebook, as usual
+
+commit 4418907357c85abb782935f58d02ff82a962d4ae
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Fri Nov 21 00:13:19 2014 -0500
+
+    uh, what?
+
+commit da15e3423b8c7c3ae4f2f9d4916d999adde4408f
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Fri Nov 21 00:09:44 2014 -0500
+
+    social stuff
+
+commit eab8f90d7a59fcd04c488cf4f441d77e206a55ab
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Tue Nov 18 03:18:28 2014 -0500
+
+    drawing pad is mostly functional
+
+commit c935b5841b1d94fd500f809209abaa601d3e53f8
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 16 06:27:00 2014 -0500
+
+    depend on pillow, prepare for unification of front & backend
+
+commit 8e3f7a6af1fb54fde68075e36a2d3d58d7560a0d
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 16 06:19:15 2014 -0500
+
+    template inheritance
+
+commit 2629b50ccd66ff33309c54c509dbe47cebaceeb6
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 16 06:01:31 2014 -0500
+
+    add favicon
+
+commit 024f433a3cf8eeec9373e7908e3ae623e9acdbd6
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 16 04:43:30 2014 -0500
+
+    pad demo
+
+commit 4b0964331440be4cd9808239b87c38a626fb061d
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 16 02:59:30 2014 -0500
+
+    relative websockets
+
+commit baa49b325ad3d9229fba9431dfb7c50237fd03f2
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 16 02:54:15 2014 -0500
+
+    websockets !
+
+commit feb021b712fb23983ca20456086d5130c3f2df6d
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 16 02:35:00 2014 -0500
+
+    svg -> png
+
+commit 6c6e49d311f722d062565b13f1462d82e7b3c708
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 16 02:28:30 2014 -0500
+
+    add svg
+
+commit 74efd72fecf445f8ade7084b8098b7ed5808eb05
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 16 02:27:28 2014 -0500
+
+    home page banner
+
+commit c646f9281a341b8c83b841e75a4a7be6e84367c1
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 16 01:51:52 2014 -0500
+
+    bind to heroku's port
+
+commit 80a486c105d045a58f6ba1513e572c205ec54b2b
+Author: Avi Romanoff <avi@romanoff.me>
+Date:   Sun Nov 16 01:45:51 2014 -0500
+
+    let the game begin

@@ -1,0 +1,18 @@
+Green wall + green ball = pass through
+Green wall + blue ball = 
+
+red ball + red wall     = pass through
+red ball + green wall   = break wall
+red ball + blue wall    = bounce back
+
+green ball + red wall   = bounce back
+green ball + green wall = pass through
+green ball + blue wall  = break wall
+
+blue ball + red wall    = break wall
+blue ball + green wall  = bounce back
+blue ball + blue wall   = pass through
+
+ R --> G
+ '\  ./
+    B
