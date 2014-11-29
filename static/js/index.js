@@ -75,10 +75,6 @@ var IndexView = BaseView.extend({
     }
   },
 
-  clearBoard: function() {
-    alert("Not implemented!");
-  },
-
   onTick: function(time, dt) {
     this.world.step(time);
   },
@@ -295,10 +291,15 @@ var IndexView = BaseView.extend({
           break;
 
         case "in_intro":
+          // If we've already started the slies, do ntohing
+          if (this.begunSlides) return;
+          this.begunSlides = true;
+          var that = this;
           $("#board").fadeOut('slow');
           $("#ask-for-intro").fadeOut('slow', function () {
-            beginSlides(function() {
-              sendMessage({type: "introFinished"});
+            that.beginSlides(function() {
+              that.sendMessage({type: "introFinished"});
+              this.begunSlides = false;
             });
           });
           break;
@@ -317,7 +318,6 @@ var IndexView = BaseView.extend({
           break;
 
         case "in_game":
-          console.log("let's gooo!!!!")
           $("#container").children().fadeOut('slow', function () {
             $("#board").fadeIn('slow');
           });
@@ -330,6 +330,7 @@ var IndexView = BaseView.extend({
 
     else if (message.type == "nextSlide") {
       this.nextSlide();
+      this.sendMessage({type: "watchIntro"});
     }
 
   }

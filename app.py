@@ -62,11 +62,13 @@ class Application(tornado.web.Application):
 
     @state.setter
     def state(self, value):
+        self._state = value
+        self.publish_state()
+        # logging.info("State changed to {}".format(value))
+        print("State changed to {}".format(value))
         if value == GameState.in_colorize:
             for player in self.players:
                 player.send_images()
-        self._state = value
-        self.publish_state()
 
     def publish_state(self):
         msg = {
@@ -86,7 +88,6 @@ class Application(tornado.web.Application):
         if not self.board:
             print("NO BOARD, dropping message!")
             return
-        print("board's state when writing is:", self.state.name)
         self.board.write_message(message)
 
     def broadcast(self, message):
@@ -117,7 +118,7 @@ class MainHandler(BaseHandler):
         self.render("index.html", profiles=profiles)
 
 class PrivacyHandler(BaseHandler):
-    
+
     def get(self):
         self.render("privacy.html")
 
@@ -210,7 +211,6 @@ class PlayerSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
             self.application.state = GameState.in_game
         elif message['type'] == "skipIntro":
             self.application.state = GameState.in_colorize
-
         elif message['type'] == "watchIntro":
             self.application.state = GameState.in_intro
         else:
@@ -232,8 +232,10 @@ class BoardSocketHandler(tornado.websocket.WebSocketHandler):
         logging.debug("BoardSocket@{} message: {}".format(id(self), repr(message)))
         if message['type'] == "slideReady":
             self.application.state = GameState.wait_for_slide
-        if message['type'] == "introFinished":
+        elif message['type'] == "introFinished":
             self.application.state = GameState.in_colorize
+        elif message['type'] == "watchIntro":
+            self.application.state = GameState.in_intro
 
 if __name__ == "__main__":
     tornado.platform.asyncio.AsyncIOMainLoop().install()

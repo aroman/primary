@@ -16,13 +16,17 @@ var BaseView = Backbone.View.extend({
     this.socket.onmessage = this._onSocketMessage.bind(this);
   },
 
+  _annotateTitle: function(annotation) {
+    window.document.title = "PRIMARY [" + annotation + "]"; 
+  },
+
   updateStatus: function(status) {
-    window.document.title = "PRIMARY [" + status + "]"; 
     this.$("#status").text(status);
+    this._annotateTitle(status);
   },
 
   sendMessage: function(message) {
-    console.log("[ws] message sent:", message);
+    console.log("[ws] sending:", message);
     this.socket.send(JSON.stringify(message));
   },
 
@@ -38,7 +42,7 @@ var BaseView = Backbone.View.extend({
 
   _onSocketMessage: function() {
     var message = JSON.parse(event.data);
-    console.log("[ws] message recieved:", message);
+    console.log("[ws] recieved:", message);
     this.onSocketMessage && this.onSocketMessage(message);
   }
 

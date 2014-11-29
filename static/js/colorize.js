@@ -60,11 +60,153 @@ var ColorizeView = BaseView.extend({
 
   initialize: function() {
     this.socketPath = "/socket/player";
+    BaseView.prototype.initialize.call(this);
+
     // Yeah, yeah, we're storing the levels
     // on the client. Deal with it.
     this.resetLevels();
     this.views = [];
-    BaseView.prototype.initialize.call(this);
+
+    // Physics stuff
+    var width = window.innerWidth * devicePixelRatio;
+    var height = window.innerHeight * devicePixelRatio;
+    this.world = Physics();
+    this.renderer = Physics.renderer('pixi', {
+      el: "pad",
+      width: width,
+      height: height
+    });
+    this.world.add(this.renderer);
+    var edgeBounce = Physics.behavior('edge-collision-detection', {
+      aabb: Physics.aabb(0, 0, width, height)
+    });
+    this.world.add(edgeBounce);
+    this.world.add(Physics.behavior('body-impulse-response', {
+      check: 'collisions:desired'
+    }));
+    this.world.add(Physics.behavior('body-collision-detection'));
+    this.world.add(Physics.behavior('sweep-prune'));
+
+    ["green", "blue", "blue", "blue","green","red","green","red","green","red","green","red","green","red","green", "red", "blue"].forEach(function (color) {
+      var ball = Physics.body('ball', {
+        x: width * Math.random(),
+        y: height * Math.random(),
+        vy: 1 * Math.random(),
+        vx: -1 * Math.random(),
+        color: color
+      });
+      this.world.add(ball);
+    }, this);
+
+    this.world.on('collisions:detected', this.onCollisions.bind(this));
+    this.world.on('step', this.onStep.bind(this));
+    Physics.util.ticker.on(this.onTick.bind(this));
+
+    // start the ticker
+    Physics.util.ticker.start();
+  },
+
+
+  onTick: function(time, dt) {
+    this.world.step(time);
+  },
+
+  onStep: function() {
+    this.world.render();
+  },
+
+  onCollisions: function(data) {
+
+    data.collisions.forEach(potentialCollision, this);
+
+    function emitCollision(collision) {
+      this.world.emit("collisions:desired", {collisions: [collision]});
+    }
+
+    function potentialCollision(collision) {
+
+      // We hit a screen boundary
+      if (!collision.bodyB.hasOwnProperty("color")) {
+        emitCollision.call(this, collision);
+        return;
+      }
+
+      // We hit another ball
+      if (collision.bodyA.treatment === "dynamic" &&
+          collision.bodyB.treatment === "dynamic") {
+        emitCollision.call(this, collision);
+        return;
+      }
+
+      // Figure out which one is the ball and
+      // which one is the wall.
+      var ball, wall;
+      if (collision.bodyA.treatment === "static") {
+        ball = collision.bodyB;
+        wall = collision.bodyA;
+      } else {
+        ball = collision.bodyA;
+        wall = collision.bodyB;
+      }
+
+      // Break wall
+      if ((ball.color === 'red' && wall.color === 'green') ||
+          (ball.color === 'green' && wall.color === 'blue') ||
+          (ball.color === 'blue' && wall.color === 'red')) {
+            this.world.remove(wall);
+            this.world.remove(ball);
+      }
+      // Pass through
+      else if (ball.color === wall.color) {
+        console.log("Pass through!");
+      }
+      // Bounce
+      else {
+        emitCollision.call(this, collision);
+      }
+    }
+  },
+
+  // start -> {x: Number, y: Number}
+  // end -> {x: Number, y: Number}
+  // color -> String
+  createBarrier: function(start, end, color) {
+    var distance = Math.sqrt(
+      Math.pow((start.x - end.x), 2)
+      +
+      Math.pow((start.y - end.y), 2)
+    );
+
+    // If the barrier is too big, split it into 
+    // two, recursively
+    if (distance > MAX_BARRIER_WIDTH) {
+      var midPoint = {
+        x: (start.x + end.x) / 2,
+        y: (start.y + end.y) / 2
+      }
+      this.createBarrier(start, midPoint, color);
+      this.createBarrier(midPoint, end, color);
+      return;
+    }
+
+    // Create static body
+    var path = Physics.body('barrier', {
+      x: (start.x + end.x) / 2,
+      y: (start.y + end.y) / 2,
+      width: distance + devicePixelRatio,
+      height: 10,
+      color: 'blue'
+    });
+
+    // Rotate it
+    var adjacent = start.x - end.x;
+    if (end.y > start.y) {
+      adjacent = -adjacent;
+    }
+    path.state.angular.pos = Math.acos(adjacent / distance);
+
+    // Add it to the world
+    this.world.add(path);
   },
 
   resetLevels: function() {
@@ -159,33 +301,45 @@ var ColorizeView = BaseView.extend({
       switch (message.state) {
 
         case "wait_for_pair":
-          this.$("#wait-for-opponent").fadeIn("slow");
-          this.$("#compare").fadeOut("slow");
-          this.$("#skip-intro").fadeOut("slow");
-          this.$("#watch-intro").fadeOut("slow");
-          this.$("#levels").fadeOut("slow");
+          $("#pad").fadeOut('slow');
+          $("#compare").fadeOut("slow");
+          $("#skip-intro").fadeOut("slow");
+          $("#watch-intro").fadeOut("slow");
+          $("#levels").fadeOut("slow");
+
+          $("#wait-for-opponent").fadeIn("slow");
           this.resetLevels();
           break;
 
         case "ask_for_intro":
-          this.$("#wait-for-opponent").fadeOut("slow");
-          this.$("#skip-intro").fadeIn("slow");
-          this.$("#watch-intro").fadeIn("slow");
-          this.$("#compare").fadeOut("slow");
+          $("#pad").fadeOut('slow');
+          $("#wait-for-opponent").fadeOut("slow");
+          $("#compare").fadeOut("slow");
+
+          $("#skip-intro").fadeIn("slow");
+          $("#watch-intro").fadeIn("slow");
           break;
 
         case "in_intro":
-          this.$("#wait-for-opponent").fadeOut("slow");
-          this.$("#skip-intro").fadeOut("slow");
-          var that = this;
-          this.$("#watch-intro").fadeOut("slow", function() {
-            that.$("#next-slide").fadeOut("slow");
+          $("#pad").fadeOut('slow');
+          $("#wait-for-opponent").fadeOut("slow");
+          $("#skip-intro").fadeOut("slow");
+          $("#watch-intro").fadeOut("slow", function() {
+            $("#next-slide").fadeOut("slow");
           });
           break;
 
         case "wait_for_slide":
-          this.$("#next-slide").fadeIn("slow");
+          $("#pad").fadeOut('slow');
+          $("#next-slide").fadeIn("slow");
           break;
+
+        case "in_game":
+          $("#container").children().fadeOut('slow', function () {
+            $("#pad").fadeIn('slow');
+          });
+          break;
+
 
       }
 
