@@ -17,6 +17,12 @@ class Liaison(object):
             self.photoIds = player['photo_ids'] = self.getPhotoIds()
             db.players.save(player)
 
+    def getProfile(self):
+        profile = self.graph.get_object("me")
+        profile['picture_url'] = self.graph.get_object("me/picture",
+            type="large", redirect=False)['data']['url']
+        return profile
+
     def getPhotoIds(self, after=None):
         photoIds = []
         # Don't pass the 'after' kwarg at all if it's not set

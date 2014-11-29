@@ -32,10 +32,10 @@ class Application(tornado.web.Application):
             (r"/pad", PadHandler),
             (r"/auth", AuthHandler),
             (r"/board", BoardHandler),
-            (r"/socket/player", PlayerSocketHandler),
-            (r"/socket/board", BoardSocketHandler),
             (r"/privacy", PrivacyHandler),
             (r"/colorize", ColorizeHandler),
+            (r"/socket/board", BoardSocketHandler),
+            (r"/socket/player", PlayerSocketHandler),
         ]
 
         self.players = {}
@@ -52,6 +52,9 @@ class Application(tornado.web.Application):
 
         super().__init__(handlers, **settings)
 
+    def send_to_board(self, message):
+        if not self.board: return
+        self.board.write_message(message)
 
 FB_APP_ID = "1557570384475065"
 FB_APP_SECRET = "fe096dedfe43239f31fbe39f7ed7300e"
@@ -69,7 +72,10 @@ class BaseHandler(tornado.web.RequestHandler):
 class MainHandler(BaseHandler):
 
     def get(self):
-        self.render("index.html")
+        players = [player.getProfile() for player in self.application.players.values()]
+        for _ in range(2 - len(players)):
+            players.append(None)
+        self.render("index.html", players=players)
 
 class PrivacyHandler(BaseHandler):
 
@@ -116,6 +122,10 @@ class AuthHandler(BaseHandler):
             db.players.save(player)
             self.set_secure_cookie('user', user['uid'])
             self.redirect("/colorize")
+            self.application.send_to_board({
+                'type': "playerConnected",
+                'profile': self.current_user.getProfile()
+            })
         else:
             self.render("auth.html")
 

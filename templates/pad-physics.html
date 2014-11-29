@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block head %}
-  <link href="/static/css/pad.css" media="all" rel="stylesheet" type="text/css" />
+  <link href="/static/css/pad.css" media="all" rel="stylesheet" type="text/css"/>
   <style>
     body {
       margin: 0;
@@ -12,7 +12,8 @@
 {% end %}
 
 {% block body %}
-  <canvas id="pad"></canvas>
+  <div id="container"></div>
+  <!-- <canvas id="pad"></canvas> -->
 <!--   <div id="brim-main">
     <div id="main-msg">rotate your phone to landscape</div>
   </div>
@@ -53,6 +54,7 @@
   <script src="/static/js/vendor/hogan.js"></script>
   <script src="/static/js/vendor/underscore.min.js"></script>
   <script src="/static/js/vendor/backbone.min.js"></script>
-  <script src="/static/js/vendor/physicsjs-full.min.js"></script>
+  <script src="/static/js/vendor/physicsjs-full-0.7.js"></script>
+  <script src="/static/js/vendor/pixi.js"></script>
   <script src="/static/js/pad-physics.js"></script>
 {% end %}

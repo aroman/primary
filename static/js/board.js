@@ -37,7 +37,7 @@ Physics.body('ball', 'circle', function(parent) {
       options.styles = {
         fillStyle: colorMap[options.color]
       };
-      options.radius = 7.5 * devicePixelRatio;
+      options.radius = 10 * devicePixelRatio;
       parent.init.call(this, options);
     }
   };
@@ -76,21 +76,11 @@ var BoardView = Backbone.View.extend({
     this.renderer = Physics.renderer('pixi', {
       el: "container",
       width: width,
-      height: height,
-      styles: {
-        'circle': {
-            lineWidth: 3
-          },
-        'rectangle': {
-            lineWidth: 3
-          }
-        },
+      height: height
     });
     this.world.add(this.renderer);
-    var bounds = Physics.aabb(0, 0, width, height);
     var edgeBounce = Physics.behavior('edge-collision-detection', {
-        aabb: bounds,
-        restitution: 1.00001
+      aabb: Physics.aabb(0, 0, width, height)
     });
     this.world.add(edgeBounce);
     this.world.add(Physics.behavior('body-impulse-response', {
@@ -99,7 +89,7 @@ var BoardView = Backbone.View.extend({
     this.world.add(Physics.behavior('body-collision-detection'));
     this.world.add(Physics.behavior('sweep-prune'));
 
-    ["green", "red","green","red","green","red","green","red","green","red","green","red","green","red","green","red","green","red","green","red","green", "red", "blue"].forEach(function (color) {
+    ["green", "blue", "blue", "blue","green","red","green","red","green","red","green","red","green","red","green", "red", "blue"].forEach(function (color) {
       var ball = Physics.body('ball', {
         x: width * Math.random(),
         y: height * Math.random(),
@@ -131,7 +121,7 @@ var BoardView = Backbone.View.extend({
   },
 
   onCollisions: function(data) {
-    
+
     data.collisions.forEach(potentialCollision, this);
 
     function emitCollision(collision) {
@@ -141,14 +131,15 @@ var BoardView = Backbone.View.extend({
     function potentialCollision(collision) {
 
       // We hit a screen boundary
-      if (!_.has(collision.bodyB, "color")) {
+      if (!collision.bodyB.hasOwnProperty("color")) {
         emitCollision.call(this, collision);
         return;
       }
 
       // We hit another ball
-      if (collision.bodyB.treatment === "dynamic" &&
-          collision.bodyA.treatment === "dynamic") {
+      if (collision.bodyA.treatment === "dynamic" &&
+          collision.bodyB.treatment === "dynamic") {
+        emitCollision.call(this, collision);
         return;
       }
 

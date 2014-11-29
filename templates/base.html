@@ -2,8 +2,14 @@
 <html>
 <head>
   <title>{% block title %}PRIMARY{% end %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/png" href="/static/img/favicon.png"/>
+  <link rel="stylesheet" href="/static/css/vendor/pure-min.css">
   <style>
+    @font-face{ 
+      font-family: 'Outage';
+      src: url('/static/css/vendor/outage.woff') format('woff');
+    }
     body {
       background-color: #2D2D2D;
       color: #fff;
@@ -17,7 +23,7 @@
   <body>
     {% block body %}
     {% end %}
-    <script src="//code.jquery.com/jquery-2.1.1.min.js"></script>
+    <script src="/static/js/vendor/jquery-2.1.1.min.js"></script>
     {% block post-scripts %}
     {% end %}
   </body>

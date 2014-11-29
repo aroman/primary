@@ -160,6 +160,25 @@
 //   }
 // });
 
+var colorMap = {
+  red: "#D0021B",
+  green: "#7ED321",
+  blue: "#4A90E2",
+};
+
+Physics.body('barrier', 'rectangle', function(parent) {
+  return {
+    init: function(options) {
+      options.styles = {
+        fillStyle: colorMap[options.color]
+      };
+      options.treatment = 'static';
+      parent.init.call(this, options);
+    }
+  };
+});
+
+
 var PadView = Backbone.View.extend({
 
   el: $("#board"),
@@ -182,21 +201,28 @@ var PadView = Backbone.View.extend({
     var width = window.innerWidth * devicePixelRatio;
     var height = window.innerHeight * devicePixelRatio;
     this.world = Physics();
+    // this.renderer = Physics.renderer('pixi', {
+    //   el: "container",
+    //   width: width,
+    //   height: height,
+    //   styles: {
+    //     'circle': {
+    //         lineWidth: 3
+    //       },
+    //     'rectangle': {
+    //         lineWidth: 3
+    //       }
+    //     },
+    // });
     this.renderer = Physics.renderer('canvas', {
       el: "pad",
       width: width,
-      height: height,
-      styles: {
-        'rectangle': {
-          fillStyle: "#fff"
-        }
-      }
+      height: height
     });
     this.world.add(this.renderer);
     var bounds = Physics.aabb(0, 0, width, height);
     var edgeBounce = Physics.behavior('edge-collision-detection', {
-        aabb: bounds,
-        restitution: 0.1
+      aabb: Physics.aabb(0, 0, width, height)
     });
     this.world.add(edgeBounce);
 
@@ -242,11 +268,12 @@ var PadView = Backbone.View.extend({
     this.runningDistance += distance;
     if (this.runningDistance < 500) return;
     this.runningDistance = 0;
-    var path = Physics.body('rectangle', {
+    var path = Physics.body('barrier', {
       x: (this.prevX + x) / 2,
       y: (this.prevY + y) / 2,
       width: distance + devicePixelRatio,
-      height: 10
+      height: 10,
+      color: 'blue'
     });
 
     var adjacent = this.prevX - x;
@@ -280,15 +307,7 @@ var PadView = Backbone.View.extend({
       return alert("multitouch not supported yet");
     }
     var touch = event.touches[0];
-    var x = touch.clientX * devicePixelRatio;
-    var y = (touch.clientY - $("body").scrollTop()) * devicePixelRatio;
-    var square = Physics.body('rectangle', {
-      x: x,
-      y: y,
-      width: 50,
-      height: 50
-    });
-    this.world.add(square);
+    this.onMouseDown(touch);
   },
 
   onTouchMove: function() {
@@ -296,15 +315,7 @@ var PadView = Backbone.View.extend({
       return alert("multitouch not supported yet");
     }
     var touch = event.touches[0];
-    var x = touch.clientX * devicePixelRatio;
-    var y = (touch.clientY - $("body").scrollTop()) * devicePixelRatio;
-    var square = Physics.body('rectangle', {
-      x: x,
-      y: y,
-      width: 50,
-      height: 50
-    });
-    this.world.add(square);
+    this.onMouseMove(touch);
   },
  
   onTouchEnd: function() {

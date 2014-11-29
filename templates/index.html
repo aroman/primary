@@ -4,20 +4,150 @@
 
   <style>
     #banner {
-      margin: auto;
-      position: absolute;
-      top: 0px;
-      left: 0;
-      bottom: 0px;
-      right: 0px;
-      width: 100%;
+      margin-top: 5%;
+      width: 90%;
     }
-    #start {
-      color: white;
-      z-index: 1000000000;
-      position: relative;
+    #status {
+      font-size: 1em;
+      font-family: monospace;
+      position: absolute;
+      bottom: 1%;
+      right: 1%;
+    }
+    .player {
+      margin-top: 25%;
+      font-family: 'Outage';
+    }
+    .player > img {
+      border-radius: 5px;
+      height: 250px;
+      border: 5px solid white;
+    }
+    .player > span {
+      display: block;
+      font-size: 2em;
+    }
+    #vs {
+      margin-top: 30%;
+      font-size: 8em;
+      font-family: 'Outage';
     }
   </style>
-  <img id="banner" src="static/img/banner.png">
-  <a id="start" href="/auth">Start game!</a>
+
+  <div id="container">
+    <div class="pure-g">
+        <div class="pure-u-1">
+          <img id="banner" src="static/img/banner-slim.png">
+        </div>
+      </div>
+    <div class="pure-g">
+      <div class="pure-u-1-3">
+        <div id="player-1" class="player"></div>
+      </div>
+      <div class="pure-u-1-3">
+        <div id="vs">vs</div>
+      </div>
+      <div class="pure-u-1-3">
+        <div id="player-2" class="player"></div>
+      </div>
+    </div>
+    <div id="status">initializing...</div>
+  </div>
+
+  <script id="player-template" type="text/x-mustache-template">
+    <img class="player-picture" src="{{! picture_url }}">
+    <span class="player-name">{{! first_name }}</span>
+    {{!#score}}
+    <span>Score: </span><span class="player-score">{{! score }}</span>
+    {{!/score}}
+  </script>
+
+{% end %}
+
+{% block post-scripts %}
+  <script src="/static/js/vendor/hogan.js"></script>
+  <script src="/static/js/vendor/underscore.min.js"></script>
+  <script src="/static/js/vendor/backbone.min.js"></script>
+  <script src="/static/js/vendor/reconnecting-websocket.js"></script>
+  <script>
+
+    var existingPlayers = {% raw json_encode(players) %};
+
+    var IndexView = Backbone.View.extend({
+
+      el: $("#container"),
+
+      events: {
+
+      },
+
+      initialize: function() {
+        // Connect websocket
+        var host = location.origin.replace(/^http/, 'ws')
+        this.socket = new ReconnectingWebSocket(host + "/socket/board");
+        this.updateStatus("connecting...");
+
+        // Compile templates
+        this.playerTemplate = Hogan.compile($("#player-template").html());
+
+        // Bind socket events
+        this.socket.onclose = this.onSocketClosed.bind(this);
+        this.socket.onopen = this.onSocketOpened.bind(this);
+        this.socket.onmessage = this.onSocketMessage.bind(this);
+
+        if (_.isEmpty(existingPlayers)) {
+          this.players = [null, null];
+        } else {
+          this.players = existingPlayers;
+        }
+        this.render();
+      },
+
+      render: function () {
+        this.players.forEach(function(profile, i) {
+          if (_.isNull(profile)) {
+            var profile = {
+              first_name: "Player " + String(i + 1),
+              picture_url: "http://i.imgur.com/2CIgGqF.png",
+            };
+          }
+          var html = this.playerTemplate.render(profile);
+          this.$("#player-" + String(i + 1)).html(html);
+        }, this);
+      },
+
+      updateStatus: function(status) {
+        this.$("#status").text(status);
+      },
+
+      sendMessage: function(message) {
+        console.log("Sending message:", message);
+        this.socket.send(JSON.stringify(message));
+      },
+
+      onSocketOpened: function() {
+        this.updateStatus("connected");
+      },
+
+      onSocketClosed: function() {
+        this.updateStatus("disconnected");
+      },
+
+      onSocketMessage: function(event) {
+        var message = JSON.parse(event.data);
+        console.log("socket message recieved!", message);
+        if (message.type == "playerConnected") {
+          if (_.isNull(this.players[0])) {
+            this.players[0] = message.profile;
+          } else {
+            this.players[1] = message.profile;
+          }
+          this.render();
+        }
+      }
+
+    });
+
+    window.view = new IndexView();
+  </script>
 {% end %}
