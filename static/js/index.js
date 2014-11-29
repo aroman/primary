@@ -35,6 +35,9 @@ var IndexView = BaseView.extend({
 
     if (this.players.length == 2 && _.every(this.players)) {
       _.delay(this.beginSlides.bind(this), 1500);
+    } else {
+      this.$(".slide, .byline, #tap-to-continue, #slide-2 > img").hide();
+      this.$("#players").show();
     }
   },
 
@@ -58,20 +61,27 @@ var IndexView = BaseView.extend({
     }
 
     var steps = [
+
       function hidePlayers(next) {
-        $("#players").addClass("animated zoomOutUp");
-        $('#players').one('webkitAnimationEnd', function() {
-          $("#players").hide();
+        var players = $("#players")
+        var classes = "animated zoomOutUp";  
+        players.addClass(classes);
+        players.one('webkitAnimationEnd', function() {
+          players.removeClass(classes)
+          players.hide();
           _.delay(next, 500);
         });
       },
 
       function showSlide1(next) {
         $("#slide-1").show();
+        var classes = "animated fadeInDown"; 
         async.eachSeries($("#slide-1 > .byline"), function(el, cont) {
-          $(el).show();
-          $(el).addClass("animated fadeInDown");
-          $(el).one("webkitAnimationEnd", function() {
+          var el = $(el);
+          el.show();
+          el.addClass(classes);
+          el.one("webkitAnimationEnd", function() {
+            el.removeClass(classes);
             _.delay(cont, 500);
           });
         }, function done() {
@@ -80,26 +90,26 @@ var IndexView = BaseView.extend({
         });
       },
 
-      function hideSlide1(next) {
-        $("#slide-1").addClass("animated fadeOutDown");
-        $('#slide-1').one('webkitAnimationEnd', function() {
-          $("#slide-1").hide();
-          _.delay(next, 500);
-        });
-      },
+      _.partial(hideSlide, $("#slide-1"), _),
 
       function showSlide2(next) {
         $("#slide-2").show();
+        var classes = "animated fadeInDown";
         async.eachSeries($("#slide-2 > img"), function(el, cont) {
-          $(el).show();
-          $(el).addClass("animated fadeInDown");
-          $(el).one("webkitAnimationEnd", function() {
+          var el = $(el);
+          el.show();
+          el.addClass(classes);
+          el.one("webkitAnimationEnd", function() {
+            el.removeClass(classes);
             _.delay(cont, 150);
           });
         }, function done() {
           waitForNextSlide(next);
         });
       },
+
+      _.partial(hideSlide, $("#slide-2"), _),
+
     ];
 
     function showSlide(slide, next) {
@@ -110,14 +120,16 @@ var IndexView = BaseView.extend({
     }
 
     function hideSlide(slide, next) {
-      slide.addClass("animated fadeOutDown");
+      var classes = "animated fadeOutDown";
+      slide.addClass(classes);
       slide.one('webkitAnimationEnd', function() {
+        slide.removeClass(classes);
         slide.hide();
         _.delay(next, 500);
       });
     }
 
-    for (var n = 2; n <= 6; n++) {
+    for (var n = 3; n <= 6; n++) {
       var slide = $("#slide-" + n);
       steps.push(
         _.partial(showSlide, slide, _),
