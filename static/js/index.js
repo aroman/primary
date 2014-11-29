@@ -149,7 +149,7 @@ var IndexView = BaseView.extend({
 
         case "ask_for_intro":
         var that = this;
-          this.$("#players").fadeOut('slow', function() {
+          this.$("#players, #in-colorize").fadeOut('slow', function() {
             that.$("#ask-for-intro").fadeIn("slow");
           });
           break;
@@ -157,7 +157,9 @@ var IndexView = BaseView.extend({
         case "in_intro":
           var that = this;
           this.$("#ask-for-intro").fadeOut('slow', function () {
-            that.beginSlides();
+            that.beginSlides(function() {
+              that.sendMessage({type: "introFinished"});
+            });
           });
           break;
 
@@ -165,7 +167,10 @@ var IndexView = BaseView.extend({
           break;
 
         case "in_colorize":
-          alert("in colorize!");
+          var that = this;
+          this.$("#ask-for-intro").fadeOut('slow', function () {
+            that.$("#in-colorize").fadeIn('slow');
+          });
           break;
 
       }

@@ -131,24 +131,27 @@ var ColorizeView = BaseView.extend({
 
       switch (message.state) {
 
+        case "wait_for_pair":
+          this.$("#wait-for-opponent").fadeIn("slow");
+          break;
+
         case "ask_for_intro":
+          this.$("#wait-for-opponent").fadeOut("slow");
           this.$("#skip-intro").fadeIn("slow");
           this.$("#watch-intro").fadeIn("slow");
           break;
 
         case "in_intro":
+          this.$("#wait-for-opponent").fadeOut("slow");
           this.$("#skip-intro").fadeOut("slow");
+          var that = this;
           this.$("#watch-intro").fadeOut("slow", function() {
-            this.$("#next-slide").fadeOut("slow");
+            that.$("#next-slide").fadeOut("slow");
           });
           break;
 
         case "wait_for_slide":
           this.$("#next-slide").fadeIn("slow");
-          break;
-
-        case "in_colorize":
-          this.getImages();
           break;
 
       }
@@ -163,6 +166,11 @@ var ColorizeView = BaseView.extend({
   },
 
   skipIntro: function() {
+    this.$("#skip-intro").fadeOut("slow");
+    var that = this;
+    this.$("#watch-intro").fadeOut("slow", function() {
+      that.$("#compare").fadeIn("slow");
+    });
     this.sendMessage({type: "skipIntro"});
   },
 
