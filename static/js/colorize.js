@@ -41,6 +41,8 @@ var ColorizeView = BaseView.extend({
 
   events: {
     "click #next-slide": "nextSlide",
+    "click #skip-intro": "skipIntro",
+    "click #watch-intro": "watchIntro",
   },
 
   initialize: function() {
@@ -124,14 +126,48 @@ var ColorizeView = BaseView.extend({
         this.$("#compare").append(view.$el);
       });
     }
-    if (message.state == "in_colorize") {
-      this.getImages();
+
+    else if (message.type == "stateChange") {
+
+      switch (message.state) {
+
+        case "ask_for_intro":
+          this.$("#skip-intro").fadeIn("slow");
+          this.$("#watch-intro").fadeIn("slow");
+          break;
+
+        case "in_intro":
+          this.$("#skip-intro").fadeOut("slow");
+          this.$("#watch-intro").fadeOut("slow", function() {
+            this.$("#next-slide").fadeOut("slow");
+          });
+          break;
+
+        case "wait_for_slide":
+          this.$("#next-slide").fadeIn("slow");
+          break;
+
+        case "in_colorize":
+          this.getImages();
+          break;
+
+      }
+
     }
+
     this.updateStatus(message.state);
   },
 
   nextSlide: function() {
     this.sendMessage({type: "nextSlide"});
+  },
+
+  skipIntro: function() {
+    this.sendMessage({type: "skipIntro"});
+  },
+
+  watchIntro: function() {
+    this.sendMessage({type: "watchIntro"});
   }
 
 });

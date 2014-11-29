@@ -34,7 +34,7 @@ var IndexView = BaseView.extend({
     }, this);
 
     if (this.players.length == 2 && _.every(this.players)) {
-      _.delay(this.beginSlides.bind(this), 1500);
+      // Uh...
     } else {
       this.$(".slide, .byline, #tap-to-continue, #slide-2 > img").hide();
       this.$("#players").show();
@@ -49,29 +49,21 @@ var IndexView = BaseView.extend({
 
         function show(next) {
           $("#tap-to-continue").fadeIn('slow');
+          that.sendMessage({
+            "type": "slideReady"
+          });
           that.nextSlide = next;
         },
 
         function hide(next) {
           $("#tap-to-continue").fadeOut('fast');
           _.delay(next, 500);
-        }
+        },
 
       ], callback);
     }
 
     var steps = [
-
-      function hidePlayers(next) {
-        var players = $("#players")
-        var classes = "animated zoomOutUp";  
-        players.addClass(classes);
-        players.one('webkitAnimationEnd', function() {
-          players.removeClass(classes)
-          players.hide();
-          _.delay(next, 500);
-        });
-      },
 
       function showSlide1(next) {
         $("#slide-1").show();
@@ -145,13 +137,44 @@ var IndexView = BaseView.extend({
   },
 
   onSocketMessage: function(message) {
-    if (message.type == "playerConnected") {
+
+    if (message.type == "playerChange") {
       this.players = message.profiles;
       this.render();
     }
+
+    else if (message.type == "stateChange") {
+
+      switch (message.state) {
+
+        case "ask_for_intro":
+        var that = this;
+          this.$("#players").fadeOut('slow', function() {
+            that.$("#ask-for-intro").fadeIn("slow");
+          });
+          break;
+
+        case "in_intro":
+          var that = this;
+          this.$("#ask-for-intro").fadeOut('slow', function () {
+            that.beginSlides();
+          });
+          break;
+
+        case "wait_for_slide":
+          break;
+
+        case "in_colorize":
+          alert("in colorize!");
+          break;
+
+      }
+    }
+
     else if (message.type == "nextSlide") {
       this.nextSlide();
     }
+
   }
 
 });

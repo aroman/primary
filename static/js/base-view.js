@@ -7,7 +7,7 @@ var BaseView = Backbone.View.extend({
   initialize: function() {
     // Connect websocket
     var host = location.origin.replace(/^http/, 'ws')
-    this.socket = new ReconnectingWebSocket(host + this.socketPath);
+    this.socket = new WebSocket(host + this.socketPath);
     this.updateStatus("connecting...");
 
     // Bind socket events

@@ -22,9 +22,12 @@ db = pymongo.MongoClient('mongodb://primary:carpediem@ds053370.mongolab.com:5337
 class GameState(enum.Enum):
     wait_for_player = 1
     wait_for_pair = 2
-    in_colorize = 3
-    in_draw = 4
-    in_main = 5
+    ask_for_intro = 3
+    wait_for_slide = 4
+    in_intro = 5
+    in_colorize = 6
+    in_draw = 7
+    in_main = 8
 
 class Application(tornado.web.Application):
 
@@ -61,8 +64,23 @@ class Application(tornado.web.Application):
         return profiles
 
     def send_to_board(self, message):
-        if not self.board: return
+        if not self.board:
+            print("NO BOARD, dropping message!")
+            return
+        print("board's state when writing is:", self.state.name)
         self.board.write_message(message)
+
+    def broadcast(self, message):
+        for socket in self.players.keys():
+            socket.write_message(message)
+
+    def update_state(self):
+        msg = {
+            'type': 'stateChange',
+            'state': self.state.name
+        }
+        self.broadcast(msg)
+        self.send_to_board(msg)
 
 FB_APP_ID = "1557570384475065"
 FB_APP_SECRET = "fe096dedfe43239f31fbe39f7ed7300e"
@@ -134,24 +152,6 @@ class AuthHandler(BaseHandler):
 
 class PlayerSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
 
-    def broadcast(self, message):
-        for socket in self.application.players.keys():
-            socket.write_message(message)
-
-    def update_state(self):
-        connectedPlayers = len(self.application.players)
-        if connectedPlayers == 1:
-            self.application.state = GameState.wait_for_pair
-        elif connectedPlayers == 2:
-            self.application.state = GameState.in_colorize
-        self.broadcast({
-            'state': self.application.state.name
-        })
-        self.application.send_to_board({
-            'type': "playerConnected",
-            'profiles': self.application.get_player_profiles()
-        })
-
     @property
     def opponent(self):
         for socket in self.application.players.keys():
@@ -160,20 +160,32 @@ class PlayerSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
 
     def open(self):
         logging.debug("PlayerSocket@{} opened".format(id(self)))
-        logging.debug("WebSocket")
-        print(self.request.__dict__)
         # sanity checks
         if not self.current_user or len(self.application.players) >= 2:
             logging.error("YOU SHOULD NOT SEE THIS AT ALL!!! UNWANTED SOCKET!!")
             raise
         self.application.players[self] = self.current_user
-        self.update_state()
+        self.application.send_to_board({
+            'type': "playerChange",
+            'profiles': self.application.get_player_profiles()
+        })
+        self.players_changed()
+
+    def players_changed(self):
+        connectedPlayers = len(self.application.players)
+        if connectedPlayers == 1:
+            self.application.state = GameState.wait_for_pair
+        elif connectedPlayers == 2:
+            self.application.state = GameState.ask_for_intro
+        self.application.send_to_board({
+            'type': "playerChange",
+            'profiles': self.application.get_player_profiles()
+        })
+        self.application.update_state();
 
     def on_close(self):
         del self.application.players[self]
-        self.update_state()
-        if self.application.board:
-            self.application.board.write_message({"type": "clear"})
+        self.players_changed()
 
     def on_message(self, message):
         message = json.loads(message)
@@ -182,26 +194,30 @@ class PlayerSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
             self.write_message({
                 "images": [self.opponent.getRandomPhoto() for _ in range(2)]
             })
+        elif message['type'] == "skipIntro":
+            self.application.state = GameState.in_colorize
+        elif message['type'] == "watchIntro":
+            self.application.state = GameState.in_intro
         else:
             self.application.send_to_board(message)
+        self.application.update_state()
 
 class BoardSocketHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         logging.debug("BoardSocket@{} opened".format(id(self)))
-        logging.debug("WebSocket")
         self.application.board = self
+        self.application.update_state()
 
     def on_close(self):
         self.application.board = None
 
     def on_message(self, message):
+        message = json.loads(message)
         logging.debug("BoardSocket@{} message: {}".format(id(self), repr(message)))
-        # if message == "move":
-
-        #     self.write_message({
-        #         "images": [self.opponent.getRandomPhoto() for _ in range(2)]
-        #     })
+        if message['type'] == "slideReady":
+            self.application.state = GameState.wait_for_slide
+        self.application.update_state()
 
 if __name__ == "__main__":
     tornado.platform.asyncio.AsyncIOMainLoop().install()
