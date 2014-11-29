@@ -5,12 +5,6 @@
   h1 {
     font-family: monospace;
   }
-  .choice:first-child {
-    float: left;
-  }
-  .choice:last-child {
-    float: right;
-  }
   .image {
     width: 400px;
     height: 400px;
@@ -19,22 +13,35 @@
   .image-overlay {
     display: none;
   }
+  #status {
+    font-size: 1em;
+    font-family: monospace;
+    position: absolute;
+    bottom: 1%;
+    right: 1%;
+  }
 </style>
 {% end %}
 
 {% block body %}
-  <div id="main">
-    <form method="POST">
-      <input type="hidden" name="red">
-      <input type="hidden" name="green">
-      <input type="hidden" name="blue">
-    </form>
-    <h1>connecting...</h1>
-
-    <button id="next-slide">next slide</button>
-
-    <div id="compare">
+  <div id="container">
+    <div class="pure-g">
+      <div class="pure-u-1-1 slide">
+        <form method="POST">
+          <input type="hidden" name="red">
+          <input type="hidden" name="green">
+          <input type="hidden" name="blue">
+        </form>
+        <button id="next-slide">next slide</button>
+      </div>
     </div>
+
+    <div id="compare" class="pure-g">
+      <div class="pure-u-1-2 slide"></div>
+      <div class="pure-u-1-2 slide"></div>
+    </div>
+
+    <div id="status">initializing...</div>
   </div>
 
   <script id="photo-template" type="text/x-mustache-template">
@@ -44,115 +51,5 @@
 {% end %}
 
 {% block post-scripts %}
-<script src="/static/js/vendor/hogan.js"></script>
-<script src="/static/js/vendor/underscore.min.js"></script>
-<script src="/static/js/vendor/backbone.min.js"></script>
-<script>
-
-    var PhotoModel = Backbone.Model.extend({
-
-    });
-
-    var PhotoView = Backbone.View.extend({
-
-      className: "choice",
-
-      events: {
-        "click img": "select",
-      },
-
-      initialize: function(options) {
-        this.template = Hogan.compile($("#photo-template").html());
-      },
-
-      select: function() {
-        this.$(".image").hide();
-        this.$(".image-overlay").show();
-        console.log("clicked image with id", this.model.get('id'));
-        var levels = this.model.get('levels');
-        $("input[name=red]").val(levels.red);
-        $("input[name=green]").val(levels.green);
-        $("input[name=blue]").val(levels.blue);
-
-        setTimeout(function () {
-          $("form").submit();
-        }, 2000);
-      },
-
-      render: function() {
-        console.log(this.model);
-        var context = this.model.toJSON();
-        var html = this.template.render(context);
-        this.$el.html(html);
-        return this;
-      }
-
-    });
-
-    var ColorizeView = Backbone.View.extend({
-
-      el: $("#main"),
-
-      events: {
-        "click #next-slide": "nextSlide",
-      },
-
-      initialize: function() {
-        var host = location.origin.replace(/^http/, 'ws')
-        this.socket = new WebSocket(host + "/socket/player");
-        this.updateStatus("connecting...");
-
-        // Bind socket events
-        this.socket.onclose = this.onSocketClosed.bind(this);
-        this.socket.onopen = this.onSocketOpened.bind(this);
-        this.socket.onmessage = this.onSocketMessage.bind(this);
-      },
-
-      sendMessage: function(message) {
-        console.log("Sending message:", message);
-        this.socket.send(JSON.stringify(message));
-      },
-
-      onSocketOpened: function() {
-        this.updateStatus("connected :)");
-      },
-
-      onSocketClosed: function() {
-        this.updateStatus("disconnected :(");
-      },
-
-      onSocketMessage: function(event) {
-        var msg = JSON.parse(event.data);
-        if ("images" in msg) {
-          console.log(msg.images[0]);
-
-          var A = new PhotoView({model: new PhotoModel(msg.images[0])});
-          var B = new PhotoView({model: new PhotoModel(msg.images[1])});
-          this.$("#compare").append(A.render().el);
-          this.$("#compare").append(B.render().el);
-        }
-        if (msg.state == "in_colorize") {
-          this.sendMessage("get_images");
-        }
-        this.updateStatus(msg.state);
-      },
-
-      nextSlide: function() {
-        this.sendMessage({type: "nextSlide"});
-      },
-
-      updateStatus: function(status) {
-        this.$("h1").text(status);
-      },
-
-      select: function() {
-        console.log("clicked")
-        console.log(event.target);
-        console.log($(event.target).attr('imgid'));
-      },
-
-    });
-
-    window.view = new ColorizeView();
-</script>
+  <script src="/static/js/colorize.js"></script>
 {% end %}

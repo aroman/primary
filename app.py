@@ -1,3 +1,5 @@
+# Copyright 2014 Avi Romanoff <avi at romanoff.me>
+
 import os
 import json
 import enum
