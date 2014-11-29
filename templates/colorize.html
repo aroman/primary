@@ -31,6 +31,8 @@
     </form>
     <h1>connecting...</h1>
 
+    <button id="next-slide">next slide</button>
+
     <div id="compare">
     </div>
   </div>
@@ -92,7 +94,7 @@
       el: $("#main"),
 
       events: {
-
+        "click #next-slide": "nextSlide",
       },
 
       initialize: function() {
@@ -108,7 +110,7 @@
 
       sendMessage: function(message) {
         console.log("Sending message:", message);
-        this.socket.send(message);
+        this.socket.send(JSON.stringify(message));
       },
 
       onSocketOpened: function() {
@@ -135,6 +137,10 @@
         this.updateStatus(msg.state);
       },
 
+      nextSlide: function() {
+        this.sendMessage({type: "nextSlide"});
+      },
+
       updateStatus: function(status) {
         this.$("h1").text(status);
       },
@@ -147,6 +153,6 @@
 
     });
 
-    new ColorizeView();
+    window.view = new ColorizeView();
 </script>
 {% end %}

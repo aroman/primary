@@ -10,6 +10,7 @@ import color
 class Liaison(object):
 
     def __init__(self, db, player):
+        self.player = player
         self.graph = facebook.GraphAPI(player['access_token'])
         if 'photo_ids' in player:
             self.photoIds = player['photo_ids']
@@ -21,6 +22,7 @@ class Liaison(object):
         profile = self.graph.get_object("me")
         profile['picture_url'] = self.graph.get_object("me/picture",
             type="large", redirect=False)['data']['url']
+        profile['score'] = str(self.player['score'])
         return profile
 
     def getPhotoIds(self, after=None):

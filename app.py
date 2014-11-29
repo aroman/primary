@@ -52,6 +52,12 @@ class Application(tornado.web.Application):
 
         super().__init__(handlers, **settings)
 
+    def get_player_profiles(self):
+        profiles = [player.getProfile() for player in self.players.values()]
+        for _ in range(2 - len(profiles)):
+            profiles.append(None)
+        return profiles
+
     def send_to_board(self, message):
         if not self.board: return
         self.board.write_message(message)
@@ -72,10 +78,8 @@ class BaseHandler(tornado.web.RequestHandler):
 class MainHandler(BaseHandler):
 
     def get(self):
-        players = [player.getProfile() for player in self.application.players.values()]
-        for _ in range(2 - len(players)):
-            players.append(None)
-        self.render("index.html", players=players)
+        profiles = self.application.get_player_profiles()
+        self.render("index.html", profiles=profiles)
 
 class PrivacyHandler(BaseHandler):
 
@@ -117,15 +121,12 @@ class AuthHandler(BaseHandler):
             res = graph.extend_access_token(FB_APP_ID, FB_APP_SECRET)
             player = {
                 '_id': user['uid'],
-                'access_token': res['access_token']
+                'access_token': res['access_token'],
+                'score': 0
             }
             db.players.save(player)
             self.set_secure_cookie('user', user['uid'])
             self.redirect("/colorize")
-            self.application.send_to_board({
-                'type': "playerConnected",
-                'profile': self.current_user.getProfile()
-            })
         else:
             self.render("auth.html")
 
@@ -143,6 +144,10 @@ class PlayerSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
             self.application.state = GameState.in_colorize
         self.broadcast({
             'state': self.application.state.name
+        })
+        self.application.send_to_board({
+            'type': "playerConnected",
+            'profiles': self.application.get_player_profiles()
         })
 
     @property
@@ -175,9 +180,7 @@ class PlayerSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
                 "images": [self.opponent.getRandomPhoto() for _ in range(2)]
             })
         else:
-            if not self.application.board: return
-            print("writing!")
-            self.application.board.write_message(message)
+            self.application.send_to_board(message)
 
 class BoardSocketHandler(tornado.websocket.WebSocketHandler):
 

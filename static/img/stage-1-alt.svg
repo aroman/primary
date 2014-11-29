@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="1175px" height="195px" viewBox="0 0 1175 195" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.1 (8751) - http://www.bohemiancoding.com/sketch -->
+    <title>Oval 3 + 1 + pick colors</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="matchmaking-alt" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="banner-5" sketch:type="MSArtboardGroup" transform="translate(-205.000000, -178.000000)">
+            <g id="Oval-3-+-1-+-pick-colors" sketch:type="MSLayerGroup" transform="translate(205.000000, 189.000000)">
+                <g id="Oval-3-+-1">
+                    <circle id="Oval-3" fill="#FFFFFF" sketch:type="MSShapeGroup" cx="75" cy="84" r="75"></circle>
+                    <text id="1" sketch:type="MSTextLayer" font-family="Outage" font-size="140" font-weight="bold" fill="#2D2D2D">
+                        <tspan x="49" y="133">1</tspan>
+                    </text>
+                </g>
+                <text id="pick-colors" sketch:type="MSTextLayer" font-family="Outage" font-size="140" font-weight="bold" fill="#FFFFFF">
+                    <tspan x="203" y="136">pick colors</tspan>
+                </text>
+            </g>
+        </g>
+    </g>
+</svg>

@@ -22,25 +22,77 @@
       border-radius: 5px;
       height: 250px;
       border: 5px solid white;
+      margin-top: 15px;
+      margin-bottom: 15px;
     }
     .player > span {
       display: block;
       font-size: 2em;
     }
+    .player-score {
+      display: inline;
+    }
+    span.player-name {
+      font-size: 3em;
+    }
     #vs {
-      margin-top: 30%;
+      margin-top: 50%;
       font-size: 8em;
       font-family: 'Outage';
+    }
+    #slides {
+      margin-top: 50px;
+    }
+    .slide {
+      display: none;
+    }
+    .byline {
+      font-family: 'Mission Script';
+      font-size: 7em;
+      line-height: 1.1em; /* Fix descenders getting cut off */
+      display: none;
+    }
+    @-webkit-keyframes pulsate {
+        0% {
+          -webkit-transform: scale(0.9, 0.9);
+        }
+        50% {
+          -webkit-transform: scale(1.1, 1.1)
+        }
+        100% {
+          -webkit-transform: scale(0.9, 0.9);
+        }
+    }
+    #tap-to-continue {
+      display: none;
+      margin-top: 25px;
+      font-family: 'Outage';
+      font-size: 4em;
+      -webkit-animation: pulsate 2s ease-in-out;
+      -webkit-animation-iteration-count: infinite; 
+    }
+    #slide-2 > img {
+      width: 55%;
+      margin: auto;
+      margin-bottom: 25px;
+      display: none;
+    }
+    .instruction {
+      font-family: 'Outage';
+      font-size: 2em;
+      max-width: 70%;
+      margin: auto;
+      margin-bottom: 25px;
     }
   </style>
 
   <div id="container">
-    <div class="pure-g">
+    <div id="logo" class="pure-g">
         <div class="pure-u-1">
           <img id="banner" src="static/img/banner-slim.png">
         </div>
       </div>
-    <div class="pure-g">
+    <div id="players" class="pure-g">
       <div class="pure-u-1-3">
         <div id="player-1" class="player"></div>
       </div>
@@ -51,27 +103,69 @@
         <div id="player-2" class="player"></div>
       </div>
     </div>
+    <div id="slides" class="pure-g">
+      <div id="slide-1" class="pure-u-1-1 slide">
+        <div class="byline byline-1">is a game of balance</div>
+        <br>
+        <div class="byline byline-2">in three stages</div>
+        <br>
+      </div>
+      <div id="slide-2" class="pure-u-1-1 slide">
+        <img src="/static/img/stage-1.svg"><br>
+        <img src="/static/img/stage-2.svg"><br>
+        <img syle="margin-bottom: 5px" src="/static/img/stage-3.svg">
+      </div>
+      <div id="slide-3" class="pure-u-1-1 slide">
+        <div class="instruction">
+        in a few moments, you will
+        see two picutres of your opponent on your phone
+        </div>
+        <img src="/static/img/pick-colors-1.svg" style="width:500px"><br>
+      </div>
+      <div id="slide-4" class="pure-u-1-1 slide">
+        <div class="instruction">
+        tap the one you think has a more balanced amount of <span style="color:#DB2023">red</span>, <span style="color:#8ED72B">green</span>, and <span style="color:#4A90E2">blue</span>
+        </div>
+        <img src="/static/img/pick-colors-2.svg" style="width:500px"><br>
+      </div>
+      <div id="slide-5" class="pure-u-1-1 slide">
+        <div class="instruction">
+        your red, green, and blue bars are now set to those percentages
+        </div>
+        <img src="/static/img/pick-colors-3.svg" style="width:500px"><br>
+      </div>
+      <div id="slide-6" class="pure-u-1-1 slide">
+        <div class="instruction">
+        repeat this three times to get your final color percentages
+        </div>
+        <img src="/static/img/pick-colors-4.svg" style="width:500px"><br>
+      </div>
+      <div id="tap-to-continue" class="pure-u-1-1">
+        <div>tap to continue</div>
+      </div>
+    </div>
     <div id="status">initializing...</div>
   </div>
 
   <script id="player-template" type="text/x-mustache-template">
-    <img class="player-picture" src="{{! picture_url }}">
     <span class="player-name">{{! first_name }}</span>
-    {{!#score}}
-    <span>Score: </span><span class="player-score">{{! score }}</span>
-    {{!/score}}
+    <img class="player-picture" src="{{! picture_url }}">
+    {{!# score }}
+    <span class="player-score">Score: {{! score }}</span>
+    {{!/ score }}
   </script>
 
 {% end %}
 
 {% block post-scripts %}
   <script src="/static/js/vendor/hogan.js"></script>
+  <script src="/static/js/vendor/async.js"></script>
   <script src="/static/js/vendor/underscore.min.js"></script>
   <script src="/static/js/vendor/backbone.min.js"></script>
   <script src="/static/js/vendor/reconnecting-websocket.js"></script>
   <script>
 
-    var existingPlayers = {% raw json_encode(players) %};
+    var existingProfiles = {% raw json_encode(profiles) %};
 
     var IndexView = Backbone.View.extend({
 
@@ -95,10 +189,10 @@
         this.socket.onopen = this.onSocketOpened.bind(this);
         this.socket.onmessage = this.onSocketMessage.bind(this);
 
-        if (_.isEmpty(existingPlayers)) {
+        if (_.isEmpty(existingProfiles)) {
           this.players = [null, null];
         } else {
-          this.players = existingPlayers;
+          this.players = existingProfiles;
         }
         this.render();
       },
@@ -114,6 +208,100 @@
           var html = this.playerTemplate.render(profile);
           this.$("#player-" + String(i + 1)).html(html);
         }, this);
+
+        if (this.players.length == 2 && _.every(this.players)) {
+          _.delay(this.beginSlides.bind(this), 1500);
+        }
+      },
+
+      beginSlides: function (callback) {
+        var that = this;
+
+        function waitForNextSlide(callback) {
+          async.series([
+
+            function show(next) {
+              $("#tap-to-continue").fadeIn('slow');
+              that.nextSlide = next;
+            },
+
+            function hide(next) {
+              $("#tap-to-continue").fadeOut('fast');
+              _.delay(next, 500);
+            }
+
+          ], callback);
+        }
+
+        var steps = [
+          function hidePlayers(next) {
+            $("#players").addClass("animated zoomOutUp");
+            $('#players').one('webkitAnimationEnd', function() {
+              $("#players").hide();
+              _.delay(next, 500);
+            });
+          },
+
+          function showSlide1(next) {
+            $("#slide-1").show();
+            async.eachSeries($("#slide-1 > .byline"), function(el, cont) {
+              $(el).show();
+              $(el).addClass("animated fadeInDown");
+              $(el).one("webkitAnimationEnd", function() {
+                _.delay(cont, 500);
+              });
+            }, function done() {
+              $("#tap-to-continue").fadeIn('slow');
+              waitForNextSlide(next);
+            });
+          },
+
+          function hideSlide1(next) {
+            $("#slide-1").addClass("animated fadeOutDown");
+            $('#slide-1').one('webkitAnimationEnd', function() {
+              $("#slide-1").hide();
+              _.delay(next, 500);
+            });
+          },
+
+          function showSlide2(next) {
+            $("#slide-2").show();
+            async.eachSeries($("#slide-2 > img"), function(el, cont) {
+              $(el).show();
+              $(el).addClass("animated fadeInDown");
+              $(el).one("webkitAnimationEnd", function() {
+                _.delay(cont, 150);
+              });
+            }, function done() {
+              waitForNextSlide(next);
+            });
+          },
+        ];
+
+        function showSlide(slide, next) {
+          slide.fadeIn('slow');
+          _.delay(function() {
+            waitForNextSlide(next);
+          }, 1200);
+        }
+
+        function hideSlide(slide, next) {
+          slide.addClass("animated fadeOutDown");
+          slide.one('webkitAnimationEnd', function() {
+            slide.hide();
+            _.delay(next, 500);
+          });
+        }
+
+        for (var n = 2; n <= 6; n++) {
+          var slide = $("#slide-" + n);
+          steps.push(
+            _.partial(showSlide, slide, _),
+            _.partial(hideSlide, slide, _)
+          );
+        }
+
+        async.series(steps, callback);
       },
 
       updateStatus: function(status) {
@@ -137,12 +325,11 @@
         var message = JSON.parse(event.data);
         console.log("socket message recieved!", message);
         if (message.type == "playerConnected") {
-          if (_.isNull(this.players[0])) {
-            this.players[0] = message.profile;
-          } else {
-            this.players[1] = message.profile;
-          }
+          this.players = message.profiles;
           this.render();
+        }
+        else if (message.type == "nextSlide") {
+          this.nextSlide();
         }
       }
 
