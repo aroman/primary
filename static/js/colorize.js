@@ -6,28 +6,25 @@ var PhotoModel = Backbone.Model.extend({
 
 var PhotoView = Backbone.View.extend({
 
-  className: "choice",
-
   events: {
-    "click img": "select",
+    "click .original": "select",
   },
 
   initialize: function(options) {
     this.template = Hogan.compile($("#photo-template").html());
+    this.render();
   },
 
   select: function() {
-    this.$(".image").hide();
-    this.$(".image-overlay").show();
+    this.$(".original").hide();
+    this.$(".colorized").show();
     console.log("clicked image with id", this.model.get('id'));
     var levels = this.model.get('levels');
     $("input[name=red]").val(levels.red);
     $("input[name=green]").val(levels.green);
     $("input[name=blue]").val(levels.blue);
 
-    setTimeout(function () {
-      $("form").submit();
-    }, 2000);
+    _.delay($("form").submit.bind(this), 2000);
   },
 
   render: function() {
@@ -42,8 +39,6 @@ var PhotoView = Backbone.View.extend({
 
 var ColorizeView = BaseView.extend({
 
-  el: $("#container"),
-
   events: {
     "click #next-slide": "nextSlide",
   },
@@ -55,15 +50,17 @@ var ColorizeView = BaseView.extend({
 
   onSocketMessage: function(message) {
     if ("images" in message) {
-      console.log(message.images[0]);
-
-      var A = new PhotoView({model: new PhotoModel(message.images[0])});
-      var B = new PhotoView({model: new PhotoModel(message.images[1])});
-      this.$("#compare").append(A.render().el);
-      this.$("#compare").append(B.render().el);
+      var A = new PhotoView({
+        model: new PhotoModel(message.images[0]),
+        el: this.$(".photo").first()[0]
+      });
+      var B = new PhotoView({
+        model: new PhotoModel(message.images[1]),
+        el: this.$(".photo").last()[0]
+      });
     }
     if (message.state == "in_colorize") {
-      this.sendMessage("get_images");
+      this.sendMessage({type: "getImages"});
     }
     this.updateStatus(message.state);
   },

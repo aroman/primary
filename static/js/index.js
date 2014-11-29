@@ -140,6 +140,10 @@ var IndexView = BaseView.extend({
     async.series(steps, callback);
   },
 
+  onSocketClosed: function() {
+    this.render();
+  },
+
   onSocketMessage: function(message) {
     if (message.type == "playerConnected") {
       this.players = message.profiles;

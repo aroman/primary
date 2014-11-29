@@ -176,8 +176,9 @@ class PlayerSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
             self.application.board.write_message({"type": "clear"})
 
     def on_message(self, message):
+        message = json.loads(message)
         logging.debug("PlayerSocket@{} message: {}".format(id(self), repr(message)))
-        if message == "get_images":
+        if message['type'] == "getImages":
             self.write_message({
                 "images": [self.opponent.getRandomPhoto() for _ in range(2)]
             })

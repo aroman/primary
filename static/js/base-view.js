@@ -11,8 +11,8 @@ var BaseView = Backbone.View.extend({
     this.updateStatus("connecting...");
 
     // Bind socket events
-    this.socket.onclose = this.onSocketClosed.bind(this);
-    this.socket.onopen = this.onSocketOpened.bind(this);
+    this.socket.onclose = this._onSocketClosed.bind(this);
+    this.socket.onopen = this._onSocketOpened.bind(this);
     this.socket.onmessage = this._onSocketMessage.bind(this);
   },
 
@@ -25,18 +25,20 @@ var BaseView = Backbone.View.extend({
     this.socket.send(JSON.stringify(message));
   },
 
-  onSocketOpened: function() {
+  _onSocketOpened: function() {
     this.updateStatus("connected");
+    this.onSocketOpened && this.onSocketOpened();
   },
 
-  onSocketClosed: function() {
+  _onSocketClosed: function() {
     this.updateStatus("disconnected");
+    this.onSocketClosed && this.onSocketClosed();
   },
 
   _onSocketMessage: function() {
     var message = JSON.parse(event.data);
     console.log("socket message recieved!", message);
-    this.onSocketMessage(message);
+    this.onSocketMessage && this.onSocketMessage(message);
   }
 
 });
