@@ -21,7 +21,7 @@ var BaseView = Backbone.View.extend({
   },
 
   sendMessage: function(message) {
-    console.log("Sending message:", message);
+    console.log("[ws] message sent:", message);
     this.socket.send(JSON.stringify(message));
   },
 
@@ -37,7 +37,7 @@ var BaseView = Backbone.View.extend({
 
   _onSocketMessage: function() {
     var message = JSON.parse(event.data);
-    console.log("socket message recieved!", message);
+    console.log("[ws] message recieved:", message);
     this.onSocketMessage && this.onSocketMessage(message);
   }
 

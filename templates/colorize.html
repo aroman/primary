@@ -10,7 +10,7 @@
   .photo > img {
     border-radius: 25px;
     width: 250px;
-    height: 250px;
+    height: 200px;
     border: 5px solid white;
   }
   .photo > img.colorized {
@@ -28,6 +28,34 @@
   }
   #next-slide {
     display: none;
+  }
+  #levels {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: none;
+  }
+  .progress {
+    position: relative;
+  }
+  .percent {
+    position: absolute;   
+    font-family: 'Outage';
+    color: #2D2D2D;
+  }
+  .bar {
+   height: 20px;
+   width: 0%;
+  }
+  .progress.red > .bar {
+    background-color: #D0021B;
+  }
+  .progress.green > .bar {
+    background-color: #8ED72B;
+  }
+  .progress.blue > .bar {
+    background-color: #4A90E2;
   }
 </style>
 {% end %}
@@ -48,6 +76,21 @@
     <div id="compare" class="pure-g">
       <div class="pure-u-1-2 photo"></div>
       <div class="pure-u-1-2 photo"></div>
+    </div>
+
+    <div id="levels">
+      <div class="progress red">
+          <span class="percent"></span>
+          <div class="bar"></div>
+      </div>
+      <div class="progress green">
+          <span class="percent"></span>
+          <div class="bar"></div>
+      </div>
+      <div class="progress blue">
+          <span class="percent"></span>
+          <div class="bar"></div>
+      </div>
     </div>
 
     <div id="status">initializing...</div>
