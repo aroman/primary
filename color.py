@@ -60,9 +60,9 @@ def colorize(image):
 		}
 	else:
 		levels = {
-			'red': rSum / total,
-			'green': gSum / total,
-			'blue': bSum / total
+			'red': round(rSum / total * 100),
+			'green': round(gSum / total * 100),
+			'blue': round(bSum / total * 100)
 		}
 
 	return (newImg, levels)
