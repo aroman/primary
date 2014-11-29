@@ -23,12 +23,25 @@ var PhotoView = Backbone.View.extend({
     this.$(".original").hide();
     this.$(".colorized").show();
     window.view.addLevels(this.model.get('levels'));
-    if (window.view.levels.red.length < ROUNDS) {
+    if (window.view.levels.red.length < (ROUNDS + 1)) {
       window.view.getImages();
+    } else {
+      window.view.startGame();
     }
+
+    // Prevent other PhotoView's events from delegating,
+    // thereby preventing the user from tapping the other
+    // image after he's already tapped this one
+    var me = this;
+    window.view.views.forEach(function(brother) {
+      if (brother !== me) {
+        brother.undelegateEvents();
+      }
+    })
   },
 
   render: function() {
+    $("#levels").fadeIn('slow');
     var context = this.model.toJSON();
     var html = this.template.render(context);
     this.$el.html(html);
@@ -49,13 +62,18 @@ var ColorizeView = BaseView.extend({
     this.socketPath = "/socket/player";
     // Yeah, yeah, we're storing the levels
     // on the client. Deal with it.
-    this.levels = {
-      red: [],
-      green: [],
-      blue: []
-    };
+    this.resetLevels();
     this.views = [];
     BaseView.prototype.initialize.call(this);
+  },
+
+  resetLevels: function() {
+    this.levels = {
+      red: [33],
+      green: [33],
+      blue: [33]
+    };
+    this.renderLevels();
   },
 
   addLevels: function(levels) {
@@ -69,15 +87,14 @@ var ColorizeView = BaseView.extend({
     _.each(this.levels, function (values, color) {
       var sum = values.reduce(function(memo, value) {
         return memo + value
-      }); 
+      }, 0); 
       var average = Math.round(sum / values.length);
-      window.view.setLevelToValue(color, average);
+      this.setLevelToValue(color, average);
     }, this);
   },
 
   setLevelToValue: function(color, value) {
     // In case it's not already visible
-    $("#levels").fadeIn();
     var progress = this.$(".progress." + color);
     progress.find(".percent").text(value + "%");
     // If the value is small enough, show the
@@ -105,8 +122,18 @@ var ColorizeView = BaseView.extend({
     this.sendMessage({type: "getImages"});
   },
 
+  startGame: function() {
+    this.sendMessage({type: "startGame"});
+  },
+
   onSocketMessage: function(message) {
     if ("images" in message) {
+      var that = this;
+      this.$("#wait-for-opponent").fadeOut("slow");
+      this.$("#skip-intro").fadeOut("slow");
+      this.$("#watch-intro").fadeOut("slow", function () {
+        that.$("#compare").fadeIn("slow");
+      });
       // remove any previous views we might have
       this.views.forEach(function(view) {
         view.remove();
@@ -133,12 +160,18 @@ var ColorizeView = BaseView.extend({
 
         case "wait_for_pair":
           this.$("#wait-for-opponent").fadeIn("slow");
+          this.$("#compare").fadeOut("slow");
+          this.$("#skip-intro").fadeOut("slow");
+          this.$("#watch-intro").fadeOut("slow");
+          this.$("#levels").fadeOut("slow");
+          this.resetLevels();
           break;
 
         case "ask_for_intro":
           this.$("#wait-for-opponent").fadeOut("slow");
           this.$("#skip-intro").fadeIn("slow");
           this.$("#watch-intro").fadeIn("slow");
+          this.$("#compare").fadeOut("slow");
           break;
 
         case "in_intro":
@@ -156,9 +189,8 @@ var ColorizeView = BaseView.extend({
 
       }
 
+      this.updateStatus(message.state);
     }
-
-    this.updateStatus(message.state);
   },
 
   nextSlide: function() {

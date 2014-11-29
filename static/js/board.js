@@ -1,48 +1,5 @@
 // Copyright 2014 Avi Romanoff <avi at romanoff.me>
 
-var colorMap = {
-  red: 0xD0021B,
-  green: 0x7ED321,
-  blue: 0x4A90E2,
-};
-
-var colors = [
-    0xb58900,
-    0xcb4b16,
-    0xdc322f,
-    0xd33682,
-    0x6c71c4,
-    0x268bd2,
-    0x2aa198,
-    0x859900
-];
-
-var MAX_BARRIER_WIDTH = 50 * devicePixelRatio;
-
-Physics.body('barrier', 'rectangle', function(parent) {
-  return {
-    init: function(options) {
-      options.styles = {
-        fillStyle: colorMap[options.color]
-      };
-      options.treatment = 'static';
-      parent.init.call(this, options);
-    }
-  };
-});
-
-Physics.body('ball', 'circle', function(parent) {
-  return {
-    init: function(options) {
-      options.styles = {
-        fillStyle: colorMap[options.color]
-      };
-      options.radius = 10 * devicePixelRatio;
-      parent.init.call(this, options);
-    }
-  };
-});
-
 var BoardView = Backbone.View.extend({
 
   el: $("#container"),
@@ -65,8 +22,6 @@ var BoardView = Backbone.View.extend({
     // Set up physics stuff
     var width = window.innerWidth * devicePixelRatio;
     var height = window.innerHeight * devicePixelRatio;
-    // $("#board")[0].width = window.innerWidth * 2;
-    // $("#board")[0].height = window.innerHeight * 2;
     this.world = Physics();
     // this.renderer = Physics.renderer('canvas', {
     //   el: "board",

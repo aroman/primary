@@ -17,6 +17,7 @@ var BaseView = Backbone.View.extend({
   },
 
   updateStatus: function(status) {
+    window.document.title = "PRIMARY [" + status + "]"; 
     this.$("#status").text(status);
   },
 

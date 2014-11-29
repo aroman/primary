@@ -16,3 +16,6 @@ blue ball + blue wall   = pass through
  R --> G
  '\  ./
     B
+
+R <-------- G -------> B
+     break    deflect

@@ -26,8 +26,7 @@ class GameState(enum.Enum):
     wait_for_slide = 4
     in_intro = 5
     in_colorize = 6
-    in_draw = 7
-    in_main = 8
+    in_game = 7
 
 class Application(tornado.web.Application):
 
@@ -67,13 +66,15 @@ class Application(tornado.web.Application):
             for player in self.players:
                 player.send_images()
         self._state = value
+        self.publish_state()
+
+    def publish_state(self):
         msg = {
             'type': 'stateChange',
             'state': self.state.name
         }
         self.broadcast(msg)
         self.send_to_board(msg)
-
     
     def get_player_profiles(self):
         profiles = [player.getProfile() for player in self.players.values()]
@@ -109,26 +110,24 @@ class BaseHandler(tornado.web.RequestHandler):
 class MainHandler(BaseHandler):
 
     def get(self):
+        if self.application.board:
+            self.write("board already exists; close it first")
+            return
         profiles = self.application.get_player_profiles()
         self.render("index.html", profiles=profiles)
 
 class PrivacyHandler(BaseHandler):
-
+    
     def get(self):
         self.render("privacy.html")
 
 class ColorizeHandler(BaseHandler):
 
     @tornado.web.authenticated
-    def post(self):
-        self.render("pad.html", levels={
-            'red': self.get_argument("red"),
-            'green': self.get_argument("green"),
-            'blue': self.get_argument("blue"),
-        })
-
-    @tornado.web.authenticated
     def get(self):
+        if len(self.application.players) == 2:
+            self.write("two players already online; kill one first")
+            return
         self.render("colorize.html")
 
 class PadHandler(BaseHandler):
@@ -207,6 +206,8 @@ class PlayerSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
         logging.debug("PlayerSocket@{} message: {}".format(id(self), repr(message)))
         if message['type'] == "getImages":
             self.send_images()
+        elif message['type'] == "startGame":
+            self.application.state = GameState.in_game
         elif message['type'] == "skipIntro":
             self.application.state = GameState.in_colorize
 
@@ -220,6 +221,8 @@ class BoardSocketHandler(tornado.websocket.WebSocketHandler):
     def open(self):
         logging.debug("BoardSocket@{} opened".format(id(self)))
         self.application.board = self
+        # Make sure the board is in sync with the server
+        self.application.publish_state()
 
     def on_close(self):
         self.application.board = None
