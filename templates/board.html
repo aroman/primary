@@ -1,29 +1,230 @@
 {% extends "base.html" %}
 
-{% block head %}
-<style>
-	body {
-		margin: 0;
-    padding: 0;
-    text-align: left !important;
-	}
-	canvas {
-    width: 100%;
-    height: 100%;
-	}
-</style>
-{% end %}
-
 {% block body %}
+
+  <style>
+    #banner {
+      margin-top: 5%;
+      width: 90%;
+    }
+    #status {
+      font-size: 1em;
+      font-family: monospace;
+      position: absolute;
+      bottom: 1%;
+      right: 1%;
+    }
+    .player {
+      margin-top: 25%;
+      font-family: 'Outage';
+    }
+    .player > img {
+      border-radius: 5px;
+      height: 250px;
+      border: 5px solid white;
+      margin-top: 15px;
+      margin-bottom: 15px;
+    }
+    .player > span {
+      display: block;
+      font-size: 2em;
+    }
+    .player-score {
+      display: inline;
+    }
+    span.player-name {
+      font-size: 3em;
+    }
+    #vs {
+      margin-top: 50%;
+      font-size: 8em;
+      font-family: 'Outage';
+    }
+    #slides {
+      margin-top: 50px;
+    }
+    .slide {
+      display: none;
+    }
+    .byline {
+      font-family: 'Mission Script';
+      font-size: 7em;
+      line-height: 1.1em; /* Fix descenders getting cut off */
+      display: none;
+    }
+    @-webkit-keyframes pulsate {
+        0% {
+          -webkit-transform: scale(0.9, 0.9);
+        }
+        50% {
+          -webkit-transform: scale(1.1, 1.1)
+        }
+        100% {
+          -webkit-transform: scale(0.9, 0.9);
+        }
+    }
+    #tap-to-continue {
+      display: none;
+      margin-top: 25px;
+      font-family: 'Outage';
+      font-size: 4em;
+      -webkit-animation: pulsate 2s ease-in-out;
+      -webkit-animation-iteration-count: infinite; 
+    }
+    #slide-2 > img {
+      width: 55%;
+      margin: auto;
+      margin-bottom: 25px;
+      display: none;
+    }
+    .instruction {
+      font-family: 'Outage';
+      font-size: 2em;
+      max-width: 70%;
+      margin: auto;
+      margin-bottom: 25px;
+    }
+    .message {
+      display: none;
+      margin-top: 20%;
+    }
+    .message > div {
+      font-family: 'Outage' !important;
+      font-size: 4em;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+    }
+    canvas {
+      width: 100%;
+      height: 100%;
+      /*background-color: orange;*/
+    }
+    #board {
+      display: none;
+    }
+    .playerStatus {
+      display: none;
+      height: 60px;
+      background-color: white !important;
+      font-family: 'Outage' !important;
+      color: #2D2D2D !important;
+      font-size: 2em;
+      padding-left: 15px;
+      padding-right: 15px;
+    }
+    .playerStatus > div {
+      margin-top: 10px;
+    }
+    .playerStatus > .name {
+      float: left;
+    } 
+    .playerStatus > .score {
+      float: right;
+    } 
+    #player-status-2 {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+    }
+  </style>
+
   <div id="container">
+    <div id="player-status-1" class="playerStatus">
+    </div>
+    <div id="board"></div>
+    <div id="player-status-2" class="playerStatus">
+    </div>
+    
+    <div id="logo" class="pure-g">
+        <div class="pure-u-1">
+          <img id="banner" src="static/img/banner-slim.png">
+        </div>
+      </div>
+    <div id="players" class="pure-g">
+      <div class="pure-u-1-3">
+        <div id="player-avatar-1" class="player"></div>
+      </div>
+      <div class="pure-u-1-3">
+        <div id="vs">vs</div>
+      </div>
+      <div class="pure-u-1-3">
+        <div id="player-avatar-2" class="player"></div>
+      </div>
+    </div>
+    <div id="ask-for-intro" class="pure-g message">
+      <div class="pure-u-1-1">skip instructions?</div>
+    </div>
+    <div id="in-colorize" class="pure-g message">
+      <div class="pure-u-1-1">eyes on your phone!</div>
+    </div>
+    <div id="slides" class="pure-g">
+      <div id="slide-1" class="pure-u-1-1 slide">
+        <div class="byline byline-1">is a game of balance</div>
+        <br>
+        <div class="byline byline-2">in three stages</div>
+        <br>
+      </div>
+      <div id="slide-2" class="pure-u-1-1 slide">
+        <img src="/static/img/stage-1.svg"><br>
+        <img src="/static/img/stage-2.svg"><br>
+        <img syle="margin-bottom: 5px" src="/static/img/stage-3.svg">
+      </div>
+      <div id="slide-3" class="pure-u-1-1 slide">
+        <div class="instruction">
+        in a few moments, you will
+        see two picutres of your opponent on your phone
+        </div>
+        <img src="/static/img/pick-colors-1.svg" style="width:500px"><br>
+      </div>
+      <div id="slide-4" class="pure-u-1-1 slide">
+        <div class="instruction">
+        tap the one you think has a more balanced amount of <span style="color:#DB2023">red</span>, <span style="color:#8ED72B">green</span>, and <span style="color:#4A90E2">blue</span>
+        </div>
+        <img src="/static/img/pick-colors-2.svg" style="width:500px"><br>
+      </div>
+      <div id="slide-5" class="pure-u-1-1 slide">
+        <div class="instruction">
+        your red, green, and blue bars are now set to those percentages
+        </div>
+        <img src="/static/img/pick-colors-3.svg" style="width:500px"><br>
+      </div>
+      <div id="slide-6" class="pure-u-1-1 slide">
+        <div class="instruction">
+        repeat this three times to get your final color percentages
+        </div>
+        <img src="/static/img/pick-colors-4.svg" style="width:500px"><br>
+      </div>
+      <div id="tap-to-continue" class="pure-u-1-1">
+        <div>tap to continue</div>
+      </div>
+    </div>
+    <div id="status">initializing...</div>
   </div>
+
+  <script id="player-avatar-template" type="text/x-mustache-template">
+    <span class="player-name">{{! first_name }}</span>
+    <img class="player-picture" src="{{! picture_url }}">
+    {{!# score }}
+    <span class="player-score">Score: {{! score }}</span>
+    {{!/ score }}
+  </script>
+
+  <script id="player-status-template" type="text/x-mustache-template">
+    <div class="name"><span>{{! name }}</span></div>
+    <div class="score"><span>Score: {{! score }}</span></div>
+  </script>
+
 {% end %}
 
 {% block post-scripts %}
-  <script src="/static/js/vendor/hogan.js"></script>
-  <script src="/static/js/vendor/underscore.min.js"></script>
-  <script src="/static/js/vendor/backbone.min.js"></script>
+  <script>
+    var existingProfiles = {% raw json_encode(profiles) %};
+  </script>
   <script src="/static/js/vendor/physicsjs-full-0.7.js"></script>
   <script src="/static/js/vendor/pixi.js"></script>
+  <script src="/static/js/engine.js"></script>
   <script src="/static/js/board.js"></script>
 {% end %}

@@ -1,35 +1,17 @@
 // Copyright 2014 Avi Romanoff <avi at romanoff.me>
 
-var BoardView = Backbone.View.extend({
-
-  el: $("#container"),
-
-  events: {
-
-  },
+var IndexView = BaseView.extend({
 
   initialize: function() {
-    // Connect websocket
-    var host = location.origin.replace(/^http/, 'ws')
-    this.socket = new WebSocket(host + "/socket/board");
-    this.updateStatus("connecting...");
+    this.socketPath = "/socket/board";
+    BaseView.prototype.initialize.call(this);
 
-    // Bind socket events
-    this.socket.onclose = this.onSocketClosed.bind(this);
-    this.socket.onopen = this.onSocketOpened.bind(this);
-    this.socket.onmessage = this.onSocketMessage.bind(this);
-
-    // Set up physics stuff
-    var width = window.innerWidth * devicePixelRatio;
-    var height = window.innerHeight * devicePixelRatio;
+    // Physics stuff
+    var width = (window.innerWidth * devicePixelRatio);
+    var height = (window.innerHeight * devicePixelRatio) - 120;
     this.world = Physics();
-    // this.renderer = Physics.renderer('canvas', {
-    //   el: "board",
-    //   width: width,
-    //   height: height
-    // });
     this.renderer = Physics.renderer('pixi', {
-      el: "container",
+      el: "board",
       width: width,
       height: height
     });
@@ -44,16 +26,16 @@ var BoardView = Backbone.View.extend({
     this.world.add(Physics.behavior('body-collision-detection'));
     this.world.add(Physics.behavior('sweep-prune'));
 
-    ["green", "blue", "blue", "blue","green","red","green","red","green","red","green","red","green","red","green", "red", "blue"].forEach(function (color) {
-      var ball = Physics.body('ball', {
-        x: width * Math.random(),
-        y: height * Math.random(),
-        vy: 1 * Math.random(),
-        vx: -1 * Math.random(),
-        color: color
-      });
-      this.world.add(ball);
-    }, this);
+    // ["green", "blue", "blue", "blue","green","red","green","red","green","red","green","red","green","red","green", "red", "blue"].forEach(function (color) {
+    //   var ball = Physics.body('ball', {
+    //     x: width * Math.random(),
+    //     y: height * Math.random(),
+    //     vy: 1 * Math.random(),
+    //     vx: -1 * Math.random(),
+    //     color: color
+    //   });
+    //   this.world.add(ball);
+    // }, this);
 
     this.world.on('collisions:detected', this.onCollisions.bind(this));
     this.world.on('step', this.onStep.bind(this));
@@ -61,10 +43,39 @@ var BoardView = Backbone.View.extend({
 
     // start the ticker
     Physics.util.ticker.start();
+
+    // Compile templates
+    this.playerAvatarTemplate = Hogan.compile($("#player-avatar-template").html());
+    this.playerStatusTemplate = Hogan.compile($("#player-status-template").html());
+
+    if (_.isEmpty(existingProfiles)) {
+      this.players = [null, null];
+    } else {
+      this.players = existingProfiles;
+    }
+    this.render();
   },
 
-  clearBoard: function() {
-    alert("Not implemented!");
+  render: function() {
+    if (this.state == 'in_game') {
+      this.players.forEach(function(profile, i) {
+        var html = this.playerStatusTemplate.render(profile);
+        this.$("#player-status-" + String(i + 1)).html(html);
+      }, this);
+    }
+    else {
+      this.players.forEach(function(profile, i) {
+        if (_.isNull(profile)) {
+          var profile = {
+            first_name: "Player " + String(i + 1),
+            picture_url: "http://i.imgur.com/2CIgGqF.png",
+          };
+        }
+        var html = this.playerAvatarTemplate.render(profile);
+        this.$("#player-avatar-" + String(i + 1)).html(html);
+      }, this);
+    }
+
   },
 
   onTick: function(time, dt) {
@@ -127,26 +138,6 @@ var BoardView = Backbone.View.extend({
     }
   },
 
-  sendMessage: function(message) {
-    console.log("Sending message:", message);
-    this.socket.send(message);
-  },
-
-  onSocketOpened: function() {
-    this.updateStatus("connected :)");
-  },
-
-  onSocketClosed: function() {
-    this.updateStatus("disconnected :(");
-  },
-
-  onSocketMessage: function(event) {
-    var msg = JSON.parse(event.data);
-    if (msg.type == "path") {
-      this.createBarrier(msg.start, msg.end, msg.color);
-    }
-  },
-
   // start -> {x: Number, y: Number}
   // end -> {x: Number, y: Number}
   // color -> String
@@ -159,7 +150,7 @@ var BoardView = Backbone.View.extend({
 
     // If the barrier is too big, split it into 
     // two, recursively
-    if (distance > MAX_BARRIER_WIDTH) {
+    if (distance > Engine.MAX_BARRIER_WIDTH) {
       var midPoint = {
         x: (start.x + end.x) / 2,
         y: (start.y + end.y) / 2
@@ -189,10 +180,180 @@ var BoardView = Backbone.View.extend({
     this.world.add(path);
   },
 
-  updateStatus: function(status) {
-    this.$("h1").text(status);
+  beginSlides: function (callback) {
+    var that = this;
+
+    function waitForNextSlide(callback) {
+      async.series([
+
+        function show(next) {
+          $("#tap-to-continue").fadeIn('slow');
+          that.sendMessage({
+            "type": "slideReady"
+          });
+          that.nextSlide = next;
+        },
+
+        function hide(next) {
+          $("#tap-to-continue").fadeOut('fast');
+          _.delay(next, 500);
+        },
+
+      ], callback);
+    }
+
+    var steps = [
+
+      function showSlide1(next) {
+        $("#slide-1").show();
+        var classes = "animated fadeInDown"; 
+        async.eachSeries($("#slide-1 > .byline"), function(el, cont) {
+          var el = $(el);
+          el.show();
+          el.addClass(classes);
+          el.one("webkitAnimationEnd", function() {
+            el.removeClass(classes);
+            _.delay(cont, 500);
+          });
+        }, function done() {
+          $("#tap-to-continue").fadeIn('slow');
+          waitForNextSlide(next);
+        });
+      },
+
+      _.partial(hideSlide, $("#slide-1"), _),
+
+      function showSlide2(next) {
+        $("#slide-2").show();
+        var classes = "animated fadeInDown";
+        async.eachSeries($("#slide-2 > img"), function(el, cont) {
+          var el = $(el);
+          el.show();
+          el.addClass(classes);
+          el.one("webkitAnimationEnd", function() {
+            el.removeClass(classes);
+            _.delay(cont, 150);
+          });
+        }, function done() {
+          waitForNextSlide(next);
+        });
+      },
+
+      _.partial(hideSlide, $("#slide-2"), _),
+
+    ];
+
+    function showSlide(slide, next) {
+      slide.fadeIn('slow');
+      _.delay(function() {
+        waitForNextSlide(next);
+      }, 1200);
+    }
+
+    function hideSlide(slide, next) {
+      var classes = "animated fadeOutDown";
+      slide.addClass(classes);
+      slide.one('webkitAnimationEnd', function() {
+        slide.removeClass(classes);
+        slide.hide();
+        _.delay(next, 500);
+      });
+    }
+
+    for (var n = 3; n <= 6; n++) {
+      var slide = $("#slide-" + n);
+      steps.push(
+        _.partial(showSlide, slide, _),
+        _.partial(hideSlide, slide, _)
+      );
+    }
+
+    async.series(steps, callback);
   },
+
+  onSocketClosed: function() {
+    this.render();
+  },
+
+  onSocketMessage: function(message) {
+
+    if (message.type == "playerChange") {
+      this.players = message.profiles;
+      this.render();
+    }
+
+    if (message.type == "path") {
+      this.createBarrier(message.start, message.end, message.color);
+    }
+
+    else if (message.type == "stateChange") {
+
+      this.state = message.state;
+      switch (message.state) {
+
+
+        case "ask_for_intro":
+          $("#board").fadeOut('slow');
+          $(".playerStatus").fadeOut('slow');
+          $("#players, #in-colorize").fadeOut('slow', function() {
+            $("#ask-for-intro").fadeIn("slow");
+          });
+          break;
+
+        case "in_intro":
+          // If we've already started the slies, do ntohing
+          if (this.begunSlides) return;
+          this.begunSlides = true;
+          var that = this;
+          $("#board").fadeOut('slow');
+          $(".playerStatus").fadeOut('slow');
+          $("#ask-for-intro").fadeOut('slow', function() {
+            that.beginSlides(function() {
+              that.sendMessage({type: "introFinished"});
+              this.begunSlides = false;
+            });
+          });
+          break;
+
+        case "wait_for_slide":
+          break;
+
+        case "wait_for_pair":
+          $(".playerStatus").fadeOut('slow');
+          $("#board").fadeOut('slow', function() {
+            $("#logo").fadeIn('slow');
+            $("#players").fadeIn('slow')
+          });
+          break;
+
+        case "in_colorize":
+          $("#board").fadeOut('slow');
+          $(".playerStatus").fadeOut('slow');
+          $("#ask-for-intro").fadeOut('slow', function() {
+            $("#in-colorize").fadeIn('slow');
+          });
+          break;
+
+        case "in_game":
+          this.render();
+          $("#container").children().fadeOut('slow', function() {
+            $(".playerStatus").show()
+            $("#board").fadeIn('slow');
+          });
+          break;
+
+      }
+
+      this.updateStatus(message.state);
+    }
+
+    else if (message.type == "nextSlide") {
+      this.nextSlide();
+      this.sendMessage({type: "watchIntro"});
+    }
+
+  }
 
 });
 
-window.board = new BoardView();
+window.view = new IndexView();

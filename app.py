@@ -32,14 +32,11 @@ class Application(tornado.web.Application):
 
     def __init__(self):
         handlers = [
-            (r"/", MainHandler),
+            (r"/", AuthHandler),
             (r"/pad", PadHandler),
-            (r"/auth", AuthHandler),
             (r"/board", BoardHandler),
-            (r"/privacy", PrivacyHandler),
-            (r"/colorize", ColorizeHandler),
+            (r"/socket/pad", PadSocketHandler),
             (r"/socket/board", BoardSocketHandler),
-            (r"/socket/player", PlayerSocketHandler),
         ]
 
         self.players = {}
@@ -51,7 +48,7 @@ class Application(tornado.web.Application):
             static_path=os.path.join(os.path.dirname(__file__), "static"),
             cookie_secret="C4RP3D13M",
             debug=True,
-            login_url="/auth"
+            login_url="/"
         )
 
         super().__init__(handlers, **settings)
@@ -94,7 +91,6 @@ class Application(tornado.web.Application):
         for socket in self.players.keys():
             socket.write_message(message)
 
-
 FB_APP_ID = "1557570384475065"
 FB_APP_SECRET = "fe096dedfe43239f31fbe39f7ed7300e"
 
@@ -107,40 +103,6 @@ class BaseHandler(tornado.web.RequestHandler):
         # If they have, return their liasion
         player = db.players.find_one({"_id": user.decode("utf-8")})
         return Liaison(db, player)
-
-class MainHandler(BaseHandler):
-
-    def get(self):
-        if self.application.board:
-            self.write("board already exists; close it first")
-            return
-        profiles = self.application.get_player_profiles()
-        self.render("index.html", profiles=profiles)
-
-class PrivacyHandler(BaseHandler):
-
-    def get(self):
-        self.render("privacy.html")
-
-class ColorizeHandler(BaseHandler):
-
-    @tornado.web.authenticated
-    def get(self):
-        if len(self.application.players) == 2:
-            self.write("two players already online; kill one first")
-            return
-        self.render("colorize.html")
-
-class PadHandler(BaseHandler):
-
-    @tornado.web.authenticated
-    def get(self):
-        self.render("pad-physics.html")
-
-class BoardHandler(BaseHandler):
-
-    def get(self):
-        self.render("board.html")
 
 class AuthHandler(BaseHandler):
 
@@ -157,11 +119,29 @@ class AuthHandler(BaseHandler):
             }
             db.players.save(player)
             self.set_secure_cookie('user', user['uid'])
-            self.redirect("/colorize")
+            self.redirect("/pad")
         else:
             self.render("auth.html")
 
-class PlayerSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
+class PadHandler(BaseHandler):
+
+    @tornado.web.authenticated
+    def get(self):
+        if len(self.application.players) == 2:
+            self.write("two players already online; kill one first")
+            return
+        self.render("pad.html")
+
+class BoardHandler(BaseHandler):
+
+    def get(self):
+        if self.application.board:
+            self.write("board already exists; close it first")
+            return
+        profiles = self.application.get_player_profiles()
+        self.render("board.html", profiles=profiles)
+
+class PadSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
 
     @property
     def opponent(self):
