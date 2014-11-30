@@ -1,5 +1,7 @@
 // Copyright 2014 Avi Romanoff <avi at romanoff.me>
 
+var MIDWAY_HEIGHT = 20;
+
 var IndexView = BaseView.extend({
 
   initialize: function() {
@@ -7,17 +9,17 @@ var IndexView = BaseView.extend({
     BaseView.prototype.initialize.call(this);
 
     // Physics stuff
-    var width = (window.innerWidth * devicePixelRatio);
-    var height = (window.innerHeight * devicePixelRatio) - 120;
+    this.width = (window.innerWidth * devicePixelRatio);
+    this.height = (window.innerHeight * devicePixelRatio) - (60 * 4);
     this.world = Physics();
     this.renderer = Physics.renderer('pixi', {
       el: "board",
-      width: width,
-      height: height
+      width: this.width,
+      height: this.height
     });
     this.world.add(this.renderer);
     var edgeBounce = Physics.behavior('edge-collision-detection', {
-      aabb: Physics.aabb(0, 0, width, height)
+      aabb: Physics.aabb(0, 0, this.width, this.height)
     });
     this.world.add(edgeBounce);
     this.world.add(Physics.behavior('body-impulse-response', {
@@ -25,17 +27,32 @@ var IndexView = BaseView.extend({
     }));
     this.world.add(Physics.behavior('body-collision-detection'));
     this.world.add(Physics.behavior('sweep-prune'));
+    var midWayLine = Physics.body('rectangle', {
+      x: 0,
+      y: this.height / 2,
+      vx: 1,
+      width: this.width * 2,
+      height: MIDWAY_HEIGHT,
+      treatment: 'static',
+      isMidWay: true,
+      styles: {
+        fillStyle: 0xffffff,
+        alpha: 0.5
+      }
+    });
+    this.world.add(midWayLine);
 
-    // ["green", "blue", "blue", "blue","green","red","green","red","green","red","green","red","green","red","green", "red", "blue"].forEach(function (color) {
-    //   var ball = Physics.body('ball', {
-    //     x: width * Math.random(),
-    //     y: height * Math.random(),
-    //     vy: 1 * Math.random(),
-    //     vx: -1 * Math.random(),
-    //     color: color
-    //   });
-    //   this.world.add(ball);
-    // }, this);
+
+    ["green"].forEach(function (color) {
+      var ball = Physics.body('ball', {
+        x: this.width * Math.random(),
+        y: this.height * Math.random(),
+        vy: 1 * Math.random(),
+        vx: -1 * Math.random(),
+        color: color
+      });
+      this.world.add(ball);
+    }, this);
 
     this.world.on('collisions:detected', this.onCollisions.bind(this));
     this.world.on('step', this.onStep.bind(this));
@@ -96,6 +113,10 @@ var IndexView = BaseView.extend({
 
     function potentialCollision(collision) {
 
+      if (collision.bodyA.isMidWay || collision.bodyB.isMidWay) {
+        return;
+      }
+
       // We hit a screen boundary
       if (!collision.bodyB.hasOwnProperty("color")) {
         emitCollision.call(this, collision);
@@ -142,10 +163,7 @@ var IndexView = BaseView.extend({
   // end -> {x: Number, y: Number}
   // color -> String
   createBarrier: function(start, end, color) {
-    start.x /= 2;
-    start.y /= 2;
-    end.x /= 2;
-    end.y /= 2;
+
     var distance = Math.sqrt(
       Math.pow((start.x - end.x), 2)
       +
@@ -170,7 +188,7 @@ var IndexView = BaseView.extend({
       y: (start.y + end.y) / 2,
       width: distance + devicePixelRatio,
       height: 10,
-      color: 'blue'
+      color: color
     });
 
     // Rotate it
@@ -191,7 +209,7 @@ var IndexView = BaseView.extend({
       async.series([
 
         function show(next) {
-          $("#tap-to-continue").fadeIn('slow');
+          $("#tap-to-continue").fadeIn();
           that.sendMessage({
             "type": "slideReady"
           });
@@ -200,7 +218,7 @@ var IndexView = BaseView.extend({
 
         function hide(next) {
           $("#tap-to-continue").fadeOut('fast');
-          _.delay(next, 500);
+          _.delay(next, 100);
         },
 
       ], callback);
@@ -226,32 +244,25 @@ var IndexView = BaseView.extend({
       },
 
       _.partial(hideSlide, $("#slide-1"), _),
+    ];
 
-      function showSlide2(next) {
-        $("#slide-2").show();
-        var classes = "animated fadeInDown";
-        async.eachSeries($("#slide-2 > img"), function(el, cont) {
+    function showSlide(slide, next) {
+      $("#banner").fadeOut("slow", function () {
+        var classes = "animated fadeIn"; 
+        slide.show();
+        async.eachSeries(slide.children(), function(el, cont) {
+          console.log(el);
           var el = $(el);
           el.show();
           el.addClass(classes);
           el.one("webkitAnimationEnd", function() {
             el.removeClass(classes);
-            _.delay(cont, 150);
+            cont();
           });
         }, function done() {
           waitForNextSlide(next);
         });
-      },
-
-      _.partial(hideSlide, $("#slide-2"), _),
-
-    ];
-
-    function showSlide(slide, next) {
-      slide.fadeIn('slow');
-      _.delay(function() {
-        waitForNextSlide(next);
-      }, 1200);
+      });
     }
 
     function hideSlide(slide, next) {
@@ -264,7 +275,7 @@ var IndexView = BaseView.extend({
       });
     }
 
-    for (var n = 3; n <= 6; n++) {
+    for (var n = 2; n <= 12; n++) {
       var slide = $("#slide-" + n);
       steps.push(
         _.partial(showSlide, slide, _),
@@ -287,6 +298,22 @@ var IndexView = BaseView.extend({
     }
 
     if (message.type == "path") {
+      // Scale based on the user's phone dimensions
+      message.start.x *= (this.width / message.screen.width );
+      message.start.y *= (this.height / message.screen.height );
+      message.end.x *= (this.width / message.screen.width);
+      message.end.y *= (this.height / message.screen.height);
+      console.log(message);
+      message.start.y /= 2;
+      message.end.y /= 2;
+      // translate to bottom half of screen
+      if (message.player === 1) {
+        message.start.y += (this.height + MIDWAY_HEIGHT) / 2;
+        message.end.y += (this.height + MIDWAY_HEIGHT) / 2;
+      } else {
+        message.start.y -= MIDWAY_HEIGHT;
+        message.end.y -= MIDWAY_HEIGHT;
+      }
       this.createBarrier(
         message.start,
         message.end,

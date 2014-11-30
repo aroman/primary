@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="347px" height="295px" viewBox="0 0 347 295" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.1 (8751) - http://www.bohemiancoding.com/sketch -->
+    <title>slide-4-graphic</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="slides" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="slide-4" sketch:type="MSArtboardGroup" transform="translate(-596.000000, -690.000000)">
+            <g id="slide-4-graphic" sketch:type="MSLayerGroup" transform="translate(589.000000, 666.000000)">
+                <text id="R" sketch:type="MSTextLayer" font-family="Outage" font-size="100" font-weight="bold" fill="#D0011B">
+                    <tspan x="146" y="95">R</tspan>
+                </text>
+                <text id="G" sketch:type="MSTextLayer" font-family="Outage" font-size="100" font-weight="bold" fill="#8ED72A">
+                    <tspan x="287.750292" y="316">G</tspan>
+                </text>
+                <text id="B" sketch:type="MSTextLayer" font-family="Outage" font-size="100" font-weight="bold" fill="#4990E2">
+                    <tspan x="0.249708282" y="319">B</tspan>
+                </text>
+                <g id="Rectangle-108-+-Triangle-11" transform="translate(181.500000, 283.960808) rotate(-90.000000) translate(-181.500000, -283.960808) translate(155.500000, 201.283121)" fill="#FFFFFF" sketch:type="MSShapeGroup">
+                    <rect id="Rectangle-108" x="16.3943464" y="11.8523958" width="20.2113073" height="153.255692"></rect>
+                    <polygon id="Triangle-5" points="26.1445783 0 51.8222892 23.7047916 0.46686747 23.7047916 "></polygon>
+                </g>
+                <g id="Rectangle-108-+-Triangle-12" transform="translate(116.960125, 175.775171) scale(1, -1) rotate(-212.000000) translate(-116.960125, -175.775171) translate(90.960125, 105.984727)" fill="#FFFFFF" sketch:type="MSShapeGroup">
+                    <rect id="Rectangle-108" x="16.3943464" y="10.0049239" width="20.2113073" height="129.367223"></rect>
+                    <polygon id="Triangle-5" points="26.1445783 0 51.8222892 20.0098477 0.46686747 20.0098477 "></polygon>
+                </g>
+                <g id="Rectangle-108-+-Triangle-13" transform="translate(257.682843, 174.404566) rotate(-212.000000) translate(-257.682843, -174.404566) translate(231.682843, 102.997934)" fill="#FFFFFF" sketch:type="MSShapeGroup">
+                    <rect id="Rectangle-108" x="16.3943464" y="10.2366151" width="20.2113073" height="132.363073"></rect>
+                    <polygon id="Triangle-5" points="26.1445783 0 51.8222892 20.4732302 0.46686747 20.4732302 "></polygon>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

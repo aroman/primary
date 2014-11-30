@@ -67,34 +67,13 @@ var ColorizeView = BaseView.extend({
     this.resetLevels();
     this.views = [];
 
-    // Physics stuff
-    var width = window.innerWidth * devicePixelRatio;
-    var height = window.innerHeight * devicePixelRatio;
-    this.world = Physics();
-    this.renderer = Physics.renderer('pixi', {
-      el: "pad",
-      width: width,
-      height: height
-    });
-    this.world.add(this.renderer);
-    var edgeBounce = Physics.behavior('edge-collision-detection', {
-      aabb: Physics.aabb(0, 0, width, height)
-    });
-    this.world.add(edgeBounce);
-    this.world.add(Physics.behavior('body-collision-detection'));
-    this.world.add(Physics.behavior('sweep-prune'));
-
-    this.world.on('step', this.onStep.bind(this));
-    Physics.util.ticker.on(this.onTick.bind(this));
-
-    var canvas = this.world.renderer().el;
-
-    canvas.onmousedown = this.onMouseDown.bind(this);
-    canvas.onmousemove = this.onMouseMove.bind(this);
-    canvas.onmouseup = this.onMouseUp.bind(this);
-
-    // start the ticker
-    Physics.util.ticker.start();
+    var pad = $("#pad");
+    pad.on("mousedown", this.onMouseDown.bind(this));
+    pad.on("mousemove", this.onMouseMove.bind(this));
+    pad.on("mouseup", this.onMouseUp.bind(this));
+    pad.on("touchstart", this.onTouchStart.bind(this));
+    pad.on("touchmove", this.onTouchMove.bind(this));
+    pad.on("touchend", this.onTouchEnd.bind(this));
   },
 
   onTick: function(time, dt) {
@@ -106,36 +85,34 @@ var ColorizeView = BaseView.extend({
   },
 
   onMouseDown: function(event) {
+    // Unwrap jQuery event
+    if ('originalEvent' in event) {
+      var event = event.originalEvent;
+    }
     this.prevX = event.clientX * devicePixelRatio;
     this.prevY = (event.clientY - $("body").scrollTop()) * devicePixelRatio;
     this.dragStarted = true;
   },
 
   onMouseMove: function(event) {
+    // Unwrap jQuery event
+    if ('originalEvent' in event) {
+      var event = event.originalEvent;
+    }
     if (!this.dragStarted) return;
     var x = event.clientX * devicePixelRatio;
     var y = (event.clientY - $("body").scrollTop()) * devicePixelRatio;
 
     var distance = Math.sqrt(Math.pow((this.prevX - x), 2) + Math.pow((this.prevY - y), 2));
     this.runningDistance += distance;
-    if (this.runningDistance < 500) return;
+    if (this.runningDistance < 100) return;
     this.runningDistance = 0;
-    var path = Physics.body('barrier', {
-      x: (this.prevX + x) / 2,
-      y: (this.prevY + y) / 2,
-      width: distance + devicePixelRatio,
-      height: 10,
-      color: 'blue'
-    });
-
-    var adjacent = this.prevX - x;
-    if (y > this.prevY) {
-      adjacent = -adjacent;
-    }
-    path.state.angular.pos = Math.acos(adjacent / distance);
-    this.world.add(path);
     this.sendMessage({
       type: 'path',
+      screen: {
+        width: window.innerWidth * devicePixelRatio,
+        height: window.innerHeight * devicePixelRatio
+      },
       start: {
         x: this.prevX,
         y: this.prevY
@@ -154,46 +131,28 @@ var ColorizeView = BaseView.extend({
     this.dragStarted = false;
   },
 
-  // start -> {x: Number, y: Number}
-  // end -> {x: Number, y: Number}
-  // color -> String
-  createBarrier: function(start, end, color) {
-    var distance = Math.sqrt(
-      Math.pow((start.x - end.x), 2)
-      +
-      Math.pow((start.y - end.y), 2)
-    );
-
-    // If the barrier is too big, split it into 
-    // two, recursively
-    if (distance > MAX_BARRIER_WIDTH) {
-      var midPoint = {
-        x: (start.x + end.x) / 2,
-        y: (start.y + end.y) / 2
-      }
-      this.createBarrier(start, midPoint, color);
-      this.createBarrier(midPoint, end, color);
-      return;
+  onTouchStart: function(event) {
+    var event = event.originalEvent;
+    if (event.touches.length > 1) {
+      alert("Multitouch not implemented");
     }
+    this.onMouseDown(event.touches[0]);
+  },
 
-    // Create static body
-    var path = Physics.body('barrier', {
-      x: (start.x + end.x) / 2,
-      y: (start.y + end.y) / 2,
-      width: distance + devicePixelRatio,
-      height: 10,
-      color: 'blue'
-    });
-
-    // Rotate it
-    var adjacent = start.x - end.x;
-    if (end.y > start.y) {
-      adjacent = -adjacent;
+  onTouchMove: function(event) {
+    var event = event.originalEvent;
+    if (event.touches.length > 1) {
+      alert("Multitouch not implemented");
     }
-    path.state.angular.pos = Math.acos(adjacent / distance);
+    this.onMouseMove(event.touches[0]);
+  },
 
-    // Add it to the world
-    this.world.add(path);
+  onTouchEnd: function(event) {
+    var event = event.originalEvent;
+    if (event.touches.length > 1) {
+      alert("Multitouch not implemented");
+    }
+    this.onMouseUp(event.touches[0]);
   },
 
   resetLevels: function() {
@@ -344,9 +303,10 @@ var ColorizeView = BaseView.extend({
     this.$("#skip-intro").fadeOut("slow");
     var that = this;
     this.$("#watch-intro").fadeOut("slow", function() {
-      that.$("#compare").fadeIn("slow");
+      // that.$("#compare").fadeIn("slow");
     });
-    this.sendMessage({type: "skipIntro"});
+    // this.sendMessage({type: "skipIntro"});
+    this.sendMessage({type: "startGame"});
   },
 
   watchIntro: function() {

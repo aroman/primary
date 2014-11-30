@@ -71,19 +71,6 @@
       -webkit-animation: pulsate 2s ease-in-out;
       -webkit-animation-iteration-count: infinite; 
     }
-    #slide-2 > img {
-      width: 55%;
-      margin: auto;
-      margin-bottom: 25px;
-      display: none;
-    }
-    .instruction {
-      font-family: 'Outage';
-      font-size: 2em;
-      max-width: 70%;
-      margin: auto;
-      margin-bottom: 25px;
-    }
     .message {
       display: none;
       margin-top: 20%;
@@ -99,7 +86,6 @@
     canvas {
       width: 100%;
       height: 100%;
-      /*background-color: orange;*/
     }
     #board {
       display: none;
@@ -129,6 +115,26 @@
       left: 0;
       right: 0;
     }
+    .title {
+      font-family: 'Outage';
+      font-size: 8em;
+      max-width: 70%;
+      margin: auto;
+      margin-bottom: 25px;
+      display: none;
+    }
+    .instruction {
+      font-family: 'Outage';
+      font-size: 3em;
+      max-width: 70%;
+      margin: auto;
+      margin-bottom: 25px;
+      display: none;
+    }
+    .graphic {
+      width: 250px;
+      display: none;
+    }
   </style>
 
   <div id="container">
@@ -140,7 +146,7 @@
     
     <div id="logo" class="pure-g">
         <div class="pure-u-1">
-          <img id="banner" src="static/img/banner-slim.png">
+          <img id="banner" src="static/img/banner.png">
         </div>
       </div>
     <div id="players" class="pure-g">
@@ -158,7 +164,7 @@
       <div class="pure-u-1-1">skip instructions?</div>
     </div>
     <div id="in-colorize" class="pure-g message">
-      <div class="pure-u-1-1">eyes on your phone!</div>
+      <div class="pure-u-1-1">eyes on your phones!</div>
     </div>
     <div id="slides" class="pure-g">
       <div id="slide-1" class="pure-u-1-1 slide">
@@ -168,34 +174,81 @@
         <br>
       </div>
       <div id="slide-2" class="pure-u-1-1 slide">
-        <img src="/static/img/stage-1.svg"><br>
-        <img src="/static/img/stage-2.svg"><br>
-        <img syle="margin-bottom: 5px" src="/static/img/stage-3.svg">
+        <div class="title">attack</div>
+        <div class="instruction">
+        the goal of the game is to score points by firing balls across your opponent’s side
+        </div>
+        <img class="graphic" src="/static/img/slide-2-graphic.svg"><br>
       </div>
       <div id="slide-3" class="pure-u-1-1 slide">
+        <div class="title">defense</div>
         <div class="instruction">
-        in a few moments, you will
-        see two picutres of your opponent on your phone
+        build walls to defend against incoming fire from your opponent
         </div>
-        <img src="/static/img/pick-colors-1.svg" style="width:500px"><br>
+        <img class="graphic" src="/static/img/slide-3-graphic.svg"><br>
       </div>
       <div id="slide-4" class="pure-u-1-1 slide">
+        <div class="title">interactions</div>
         <div class="instruction">
-        tap the one you think has a more balanced amount of <span style="color:#DB2023">red</span>, <span style="color:#8ED72B">green</span>, and <span style="color:#4A90E2">blue</span>
+        each ball color interacts differently with each wall color, in looping r-g-b order
         </div>
-        <img src="/static/img/pick-colors-2.svg" style="width:500px"><br>
+        <img class="graphic" src="/static/img/slide-4-graphic.svg"><br>
       </div>
       <div id="slide-5" class="pure-u-1-1 slide">
+        <div class="title">same color</div>
         <div class="instruction">
-        your red, green, and blue bars are now set to those percentages
+        balls pass through walls of the same color
         </div>
-        <img src="/static/img/pick-colors-3.svg" style="width:500px"><br>
+        <img class="graphic" src="/static/img/slide-5-graphic.svg"><br>
       </div>
       <div id="slide-6" class="pure-u-1-1 slide">
+        <div class="title">up-color</div>
         <div class="instruction">
-        repeat this three times to get your final color percentages
+        balls break walls of the color that is immediately after it in rgb order
         </div>
-        <img src="/static/img/pick-colors-4.svg" style="width:500px"><br>
+        <img class="graphic" src="/static/img/slide-6-graphic.svg"><br>
+      </div>
+      <div id="slide-7" class="pure-u-1-1 slide">
+        <div class="title">down-color</div>
+        <div class="instruction">
+        balls are deflected by walls of the color that is immediately before it in rgb order
+        </div>
+        <img class="graphic" src="/static/img/slide-7-graphic.svg"><br>
+      </div>
+      <div id="slide-8" class="pure-u-1-1 slide">
+        <div class="title">controls</div>
+        <div class="instruction">
+        drag with 1 finger to draw walls. flick with 2 fingers to fire ball.
+        </div>
+        <img class="graphic" src="/static/img/slide-8-graphic.svg"><br>
+      </div>
+      <div id="slide-9" class="pure-u-1-1 slide">
+        <div class="title">pick colors</div>
+        <div class="instruction">
+        in a few moments, you will see two picutres of your opponent on your phone
+        </div>
+        <img class="graphic" src="/static/img/slide-9-graphic.svg"><br>
+      </div>
+      <div id="slide-10" class="pure-u-1-1 slide">
+        <div class="title">pick colors</div>
+        <div class="instruction">
+        tap the one you think has a more balanced amount of <span style="color:#D0021B">red</span>, <span style="color:#7ED321">green</span>, and <span style="color:#4A90E2">blue</span>
+        </div>
+        <img class="graphic" src="/static/img/slide-10-graphic.svg"><br>
+      </div>
+      <div id="slide-11" class="pure-u-1-1 slide">
+        <div class="title">pick colors</div>
+        <div class="instruction">
+        you do this 3 times. each time, the color levels of the picture are added to your totals
+        </div>
+        <img class="graphic" src="/static/img/slide-11-graphic.svg"><br>
+      </div>
+      <div id="slide-12" class="pure-u-1-1 slide">
+        <div class="title">color totals</div>
+        <div class="instruction">
+        these levels determine how quickly you can fire balls &amp; build walls of that color
+        </div>
+        <img class="graphic" src="/static/img/slide-12-graphic.svg"><br>
       </div>
       <div id="tap-to-continue" class="pure-u-1-1">
         <div>tap to continue</div>

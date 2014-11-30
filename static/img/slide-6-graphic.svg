@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg width="410px" height="531px" viewBox="0 0 410 531" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:sketch="http://www.bohemiancoding.com/sketch/ns">
+    <!-- Generator: Sketch 3.1 (8751) - http://www.bohemiancoding.com/sketch -->
+    <title>slide-6-graphic</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path id="path-1" d="M9.9475983e-14,34.381295 L67.6380952,59.8489209"></path>
+        <path id="path-2" d="M79.1238095,61.1223022 L156.971429,49.2714374"></path>
+        <path id="path-3" d="M167.180952,44.5683453 L228.875223,-5.7909233e-13"></path>
+        <path id="path-4" d="M-2.27373675e-13,34.381295 L67.6380952,59.8489209"></path>
+        <path id="path-5" d="M167.180952,44.5683453 L228.875223,-1.15107923e-12"></path>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-6">
+            <feGaussianBlur stdDeviation="0.227050781 0" in="SourceGraphic" result="blur"></feGaussianBlur>
+        </filter>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-7">
+            <feGaussianBlur stdDeviation="6.35986328 0" in="SourceGraphic" result="blur"></feGaussianBlur>
+        </filter>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-8">
+            <feGaussianBlur stdDeviation="6.35986328 0" in="SourceGraphic" result="blur"></feGaussianBlur>
+        </filter>
+        <path id="path-9" d="M4.54747351e-13,34.381295 L67.6380952,59.8489209"></path>
+        <path id="path-10" d="M79.1238095,61.1223022 L156.971429,49.2714374"></path>
+        <path id="path-11" d="M167.180952,44.5683453 L228.875223,5.68434189e-13"></path>
+        <path id="path-12" d="M-1.13686838e-13,34.381295 L67.6380952,59.8489209"></path>
+        <path id="path-13" d="M167.180952,44.5683453 L228.875223,-6.82121026e-13"></path>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-14">
+            <feGaussianBlur stdDeviation="0.227050781 0" in="SourceGraphic" result="blur"></feGaussianBlur>
+        </filter>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-15">
+            <feGaussianBlur stdDeviation="6.35986328 0" in="SourceGraphic" result="blur"></feGaussianBlur>
+        </filter>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-16">
+            <feGaussianBlur stdDeviation="6.35986328 0" in="SourceGraphic" result="blur"></feGaussianBlur>
+        </filter>
+    </defs>
+    <g id="slides" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
+        <g id="slide-6" sketch:type="MSArtboardGroup" transform="translate(-490.000000, -520.000000)">
+            <g id="slide-6-graphic" sketch:type="MSLayerGroup" transform="translate(508.000000, 531.000000)">
+                <g id="Line-26-+-Line-39-+-Line-47" transform="translate(160.187302, 118.425050) rotate(-70.000000) translate(-160.187302, -118.425050) translate(45.330159, 87.863899)" stroke-linecap="square">
+                    <g id="Line-26">
+                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-1"></use>
+                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-1"></use>
+                    </g>
+                    <g id="Line-39">
+                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-2"></use>
+                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-2"></use>
+                    </g>
+                    <g id="Line-44">
+                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-3"></use>
+                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-3"></use>
+                    </g>
+                </g>
+                <g id="Line-26-+-Line-39-+-Line-47" transform="translate(349.435836, 118.098883) rotate(-70.000000) translate(-349.435836, -118.098883) translate(234.435836, 88.098883)" stroke-linecap="square">
+                    <g id="Line-26">
+                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-4"></use>
+                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-4"></use>
+                    </g>
+                    <g id="Line-44">
+                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-5"></use>
+                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-5"></use>
+                    </g>
+                </g>
+                <g id="Rectangle-108-+-Triangle-14" transform="translate(281.425397, 118.015493) rotate(90.000000) translate(-281.425397, -118.015493) translate(252.498413, 88.727723)" fill="#FFFFFF" sketch:type="MSShapeGroup">
+                    <rect id="Rectangle-108" x="18.2141992" y="12.3093525" width="20.754555" height="46.2661871"></rect>
+                    <polygon id="Triangle-5" points="28.9269841 -0.0027303142 58.1422643 35.6546763 -0.288296041 35.6546763 "></polygon>
+                </g>
+                <ellipse id="Oval-31" fill="#D0011B" filter="url(#filter-6)" sketch:type="MSShapeGroup" cx="108.714286" cy="115.222166" rx="31.9047619" ry="31.8345324"></ellipse>
+                <ellipse id="Oval-30" fill-opacity="0.5" fill="#D0011B" filter="url(#filter-7)" sketch:type="MSShapeGroup" cx="76.6380952" cy="111.165468" rx="31.9047619" ry="31.8345324"></ellipse>
+                <ellipse id="Oval-29" fill-opacity="0.25" fill="#D0021B" filter="url(#filter-8)" sketch:type="MSShapeGroup" cx="40.9047619" cy="111.165468" rx="31.9047619" ry="31.8345324"></ellipse>
+                <g id="Line-26-+-Line-39-+-Line-49" transform="translate(151.460780, 397.269893) rotate(-70.000000) translate(-151.460780, -397.269893) translate(36.460780, 366.769893)" stroke-linecap="square">
+                    <g id="Line-26">
+                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-9"></use>
+                        <use stroke="#4990E2" stroke-width="10.2" xlink:href="#path-9"></use>
+                    </g>
+                    <g id="Line-39">
+                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-10"></use>
+                        <use stroke="#4990E2" stroke-width="10.2" xlink:href="#path-10"></use>
+                    </g>
+                    <g id="Line-44">
+                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-11"></use>
+                        <use stroke="#4990E2" stroke-width="10.2" xlink:href="#path-11"></use>
+                    </g>
+                </g>
+                <g id="Line-26-+-Line-39-+-Line-48" transform="translate(340.717918, 397.098883) rotate(-70.000000) translate(-340.717918, -397.098883) translate(225.717918, 367.098883)" stroke-linecap="square">
+                    <g id="Line-26">
+                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-12"></use>
+                        <use stroke="#4990E2" stroke-width="10.2" xlink:href="#path-12"></use>
+                    </g>
+                    <g id="Line-44">
+                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-13"></use>
+                        <use stroke="#4990E2" stroke-width="10.2" xlink:href="#path-13"></use>
+                    </g>
+                </g>
+                <g id="Rectangle-108-+-Triangle-15" transform="translate(272.707479, 397.015493) rotate(90.000000) translate(-272.707479, -397.015493) translate(243.780495, 367.727723)" fill="#FFFFFF" sketch:type="MSShapeGroup">
+                    <rect id="Rectangle-108" x="18.2141992" y="12.3093525" width="20.754555" height="46.2661871"></rect>
+                    <polygon id="Triangle-5" points="28.9269841 -0.0027303142 58.1422643 35.6546763 -0.288296041 35.6546763 "></polygon>
+                </g>
+                <ellipse id="Oval-34" fill="#8ED72A" filter="url(#filter-14)" sketch:type="MSShapeGroup" cx="99.9963676" cy="394.222166" rx="31.9047619" ry="31.8345324"></ellipse>
+                <ellipse id="Oval-33" fill-opacity="0.5" fill="#8ED72A" filter="url(#filter-15)" sketch:type="MSShapeGroup" cx="67.9201771" cy="390.165468" rx="31.9047619" ry="31.8345324"></ellipse>
+                <ellipse id="Oval-32" fill-opacity="0.25" fill="#8ED72A" filter="url(#filter-16)" sketch:type="MSShapeGroup" cx="32.1868438" cy="390.165468" rx="31.9047619" ry="31.8345324"></ellipse>
+            </g>
+        </g>
+    </g>
+</svg>
