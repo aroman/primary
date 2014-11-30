@@ -14,7 +14,9 @@ Physics.body('barrier', 'rectangle', function(parent) {
   return {
     init: function(options) {
       options.styles = {
-        fillStyle: Engine.colors[options.color]
+        fillStyle: Engine.colors[options.color],
+        strokeStyle: 0x0,
+        lineWidth: 3
       };
       options.treatment = 'static';
       parent.init.call(this, options);
