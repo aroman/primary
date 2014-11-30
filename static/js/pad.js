@@ -1,6 +1,11 @@
 // Copyright 2014 Avi Romanoff <avi at romanoff.me>
 
 var ROUNDS = 1;
+var WALL_COST = 4;
+var BALL_COST = 5;
+var REGEN_INCREMENT = 1;
+var REGEN_DELAY = 2000;
+var MIN_WALL_WIDTH = 400 * devicePixelRatio;
 
 var PhotoModel = Backbone.Model.extend({
 
@@ -23,7 +28,7 @@ var PhotoView = Backbone.View.extend({
     this.$(".original").hide();
     this.$(".colorized").show();
     window.view.addLevels(this.model.get('levels'));
-    if (window.view.levels.red.length < (ROUNDS + 1)) {
+    if (window.view.levels.red.values.length < (ROUNDS + 1)) {
       window.view.getImages();
     } else {
       window.view.startGame();
@@ -66,6 +71,7 @@ var ColorizeView = BaseView.extend({
     // on the client. Deal with it.
     this.resetLevels();
     this.views = [];
+    this.currentColor = "red";
 
     var pad = $("#pad");
     pad.on("mousedown", this.onMouseDown.bind(this));
@@ -74,6 +80,11 @@ var ColorizeView = BaseView.extend({
     pad.on("touchstart", this.onTouchStart.bind(this));
     pad.on("touchmove", this.onTouchMove.bind(this));
     pad.on("touchend", this.onTouchEnd.bind(this));
+
+    setInterval(
+      this.regenerateColors.bind(this),
+      REGEN_DELAY
+    );
   },
 
   onTick: function(time, dt) {
@@ -82,6 +93,21 @@ var ColorizeView = BaseView.extend({
 
   onStep: function() {
     this.world.render();
+  },
+
+  regenerateColors: function() {
+    var changed = false;
+    _.each(_.keys(this.levels), function(color) {
+      var level = this.levels[color];
+      if (level.current < level.max) {
+        var scaleFactor = 1 + (level.current / 100);
+        level.current += REGEN_INCREMENT * scaleFactor;
+        changed = true;
+      }
+    }, this);
+    if (changed) {
+      this.renderLevels();
+    }
   },
 
   onMouseDown: function(event) {
@@ -100,15 +126,17 @@ var ColorizeView = BaseView.extend({
       var event = event.originalEvent;
     }
     if (!this.dragStarted) return;
+    if (this.levels[this.currentColor].current < WALL_COST) return;
     var x = event.clientX * devicePixelRatio;
     var y = (event.clientY - $("body").scrollTop()) * devicePixelRatio;
 
     var distance = Math.sqrt(Math.pow((this.prevX - x), 2) + Math.pow((this.prevY - y), 2));
     this.runningDistance += distance;
-    if (this.runningDistance < 100) return;
+    if (this.runningDistance < MIN_WALL_WIDTH) return;
+    this.levels[this.currentColor].current -= WALL_COST;
     this.runningDistance = 0;
     this.sendMessage({
-      type: 'path',
+      type: 'wall',
       screen: {
         width: window.innerWidth * devicePixelRatio,
         height: window.innerHeight * devicePixelRatio
@@ -121,10 +149,11 @@ var ColorizeView = BaseView.extend({
         x: x,
         y: y
       },
-      color: "blue"
+      color: this.currentColor
     });
     this.prevX = x;
     this.prevY = y;
+    this.renderLevels();
   },
 
   onMouseUp: function(event) {
@@ -132,19 +161,36 @@ var ColorizeView = BaseView.extend({
   },
 
   onTouchStart: function(event) {
+    event.preventDefault();
     var event = event.originalEvent;
-    if (event.touches.length > 1) {
-      alert("Multitouch not implemented");
+    if (event.touches.length == 1) {
+      this.onMouseDown(event.touches[0]);
     }
-    this.onMouseDown(event.touches[0]);
   },
 
   onTouchMove: function(event) {
+    event.preventDefault();
     var event = event.originalEvent;
-    if (event.touches.length > 1) {
-      alert("Multitouch not implemented");
+    if (event.touches.length === 1) {
+      this.onMouseMove(event.touches[0]);
     }
-    this.onMouseMove(event.touches[0]);
+    else if (event.touches.length === 2) {
+      this.sendMessage({
+        type: 'ball',
+        screen: {
+          width: window.innerWidth * devicePixelRatio,
+          height: window.innerHeight * devicePixelRatio
+        },
+        x: event.touches[0].clientX,
+        y: event.touches[0].clientY,
+        vx: -1,
+        vy: 0,
+        color: this.currentColor
+      });
+    }
+    else {
+      alert("gesture unsupported");
+    }
   },
 
   onTouchEnd: function(event) {
@@ -157,37 +203,58 @@ var ColorizeView = BaseView.extend({
 
   resetLevels: function() {
     this.levels = {
-      red: [33],
-      green: [33],
-      blue: [33]
+      red: {
+        max: null,
+        current: null,
+        values: [100 / 3]
+      },
+      green: {
+        max: null,
+        current: null,
+        values: [100 / 3]
+      },
+      blue: {
+        max: null,
+        current: null,
+        values: [100 / 3]
+      }
     };
     this.renderLevels();
   },
 
-  addLevels: function(levels) {
-    _.each(levels, function (value, color) {
-      this.levels[color].push(value);
+  addLevels: function(colorValueMap) {
+    _.each(colorValueMap, function(value, color) {
+      var level = this.levels[color]; 
+      level.values.push(value);
+      var sum = level.values.reduce(function(memo, value) {
+        return memo + value
+      }, 0);
+      level.max = level.current = Math.round(sum / level.values.length);
     }, this);
     this.renderLevels();
   },
 
   renderLevels: function() {
-    _.each(this.levels, function (values, color) {
-      var sum = values.reduce(function(memo, value) {
-        return memo + value
-      }, 0); 
-      var average = Math.round(sum / values.length);
-      this.setLevelToValue(color, average);
+    _.each(this.levels, function(data, color) {
+      if (_.isNull(data.current)) {
+        this.setLevelToValue(color, data.values[0]);
+      } else {
+        this.setLevelToValue(color,data.current);
+      }
     }, this);
   },
 
   setLevelToValue: function(color, value) {
+    value = Math.round(value);
     // In case it's not already visible
     var progress = this.$(".progress." + color);
     progress.find(".percent").text(value + "%");
+    // Finish the existing animations queue
+    progress.find(".percent").finish();
+    progress.find(".bar").finish();
     // If the value is small enough, show the
     // label next to the bar, and in inside it
-    if (value <= 6) {
+    if (value <= 9) {
       progress.find(".percent").css("color", "white");
       progress.find(".percent").animate({
         left: (value + 1) + "%"
@@ -284,7 +351,7 @@ var ColorizeView = BaseView.extend({
           break;
 
         case "in_game":
-          $("#container").children().fadeOut('slow', function () {
+          $("#container").children().not("#levels").fadeOut('slow', function () {
             $("#pad").fadeIn('slow');
           });
           break;
@@ -303,10 +370,9 @@ var ColorizeView = BaseView.extend({
     this.$("#skip-intro").fadeOut("slow");
     var that = this;
     this.$("#watch-intro").fadeOut("slow", function() {
-      // that.$("#compare").fadeIn("slow");
+      that.$("#compare").fadeIn("slow");
     });
-    // this.sendMessage({type: "skipIntro"});
-    this.sendMessage({type: "startGame"});
+    this.sendMessage({type: "skipIntro"});
   },
 
   watchIntro: function() {

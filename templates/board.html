@@ -90,7 +90,7 @@
     #board {
       display: none;
     }
-    .playerStatus {
+    .player-status {
       display: none;
       height: 60px;
       background-color: white !important;
@@ -99,14 +99,15 @@
       font-size: 2em;
       padding-left: 15px;
       padding-right: 15px;
+      box-shadow:0px 0px 20px white;
     }
-    .playerStatus > div {
+    .player-status > div {
       margin-top: 10px;
     }
-    .playerStatus > .name {
+    .player-status > .name {
       float: left;
     } 
-    .playerStatus > .score {
+    .player-status > .score {
       float: right;
     } 
     #player-status-2 {
@@ -135,13 +136,16 @@
       width: 250px;
       display: none;
     }
+    #themesong {
+      display: none;
+    }
   </style>
 
   <div id="container">
-    <div id="player-status-1" class="playerStatus">
+    <div id="player-status-1" class="player-status">
     </div>
     <div id="board"></div>
-    <div id="player-status-2" class="playerStatus">
+    <div id="player-status-2" class="player-status">
     </div>
     
     <div id="logo" class="pure-g">
@@ -255,6 +259,7 @@
       </div>
     </div>
     <div id="status">initializing...</div>
+    <audio id="themesong" src="/static/gardenparty.mp3" preload="auto" controls></audio>
   </div>
 
   <script id="player-avatar-template" type="text/x-mustache-template">

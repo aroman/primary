@@ -54,9 +54,9 @@ def colorize(image):
 	# image was grayscale
 	if total == 0:
 		levels = {
-			'red': 0,
-			'green': 0,
-			'blue': 0
+			'red': 33,
+			'green': 33,
+			'blue': 33
 		}
 	else:
 		levels = {

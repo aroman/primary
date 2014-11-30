@@ -28,10 +28,10 @@ var IndexView = BaseView.extend({
     this.world.add(Physics.behavior('body-collision-detection'));
     this.world.add(Physics.behavior('sweep-prune'));
     var midWayLine = Physics.body('rectangle', {
-      x: 0,
+      x: this.width / 2, // wut
       y: this.height / 2,
       vx: 1,
-      width: this.width * 2,
+      width: this.width,
       height: MIDWAY_HEIGHT,
       treatment: 'static',
       isMidWay: true,
@@ -41,18 +41,6 @@ var IndexView = BaseView.extend({
       }
     });
     this.world.add(midWayLine);
-
-
-    ["green"].forEach(function (color) {
-      var ball = Physics.body('ball', {
-        x: this.width * Math.random(),
-        y: this.height * Math.random(),
-        vy: 1 * Math.random(),
-        vx: -1 * Math.random(),
-        color: color
-      });
-      this.world.add(ball);
-    }, this);
 
     this.world.on('collisions:detected', this.onCollisions.bind(this));
     this.world.on('step', this.onStep.bind(this));
@@ -119,7 +107,22 @@ var IndexView = BaseView.extend({
 
       // We hit a screen boundary
       if (!collision.bodyB.hasOwnProperty("color")) {
-        emitCollision.call(this, collision);
+        var ball = collision.bodyA;
+        // top edge
+        if (ball.state.pos.get(1) < 20) {
+          this.players[1].score += 10;
+          this.render();
+          this.world.remove(ball);
+        }
+        // bottom edge
+        else if ((this.height - ball.state.pos.get(1)) < 20) {
+          this.players[0].score += 10;
+          this.render();
+          this.world.remove(ball);
+        }
+        else {
+          emitCollision.call(this, collision);
+        }
         return;
       }
 
@@ -182,8 +185,8 @@ var IndexView = BaseView.extend({
       return;
     }
 
-    // Create static body
-    var path = Physics.body('wall', {
+    // Create wall
+    var wall = Physics.body('wall', {
       x: (start.x + end.x) / 2,
       y: (start.y + end.y) / 2,
       width: distance + devicePixelRatio,
@@ -196,10 +199,26 @@ var IndexView = BaseView.extend({
     if (end.y > start.y) {
       adjacent = -adjacent;
     }
-    path.state.angular.pos = Math.acos(adjacent / distance);
+    wall.state.angular.pos = Math.acos(adjacent / distance);
 
     // Add it to the world
-    this.world.add(path);
+    this.world.add(wall);
+  },
+
+  createBall: function(x, y, vx, vy, color) {
+    console.log("createBall called with", arguments);
+
+    // Create ball
+    var ball = Physics.body('ball', {
+      x: x,
+      y: x,
+      vx: vx,
+      vy: vy,
+      color: color
+    });
+
+    // Add it to the world
+    this.world.add(ball);
   },
 
   beginSlides: function (callback) {
@@ -297,7 +316,7 @@ var IndexView = BaseView.extend({
       this.render();
     }
 
-    if (message.type == "path") {
+    if (message.type == "wall") {
       // Scale based on the user's phone dimensions
       message.start.x *= (this.width / message.screen.width );
       message.start.y *= (this.height / message.screen.height );
@@ -321,6 +340,27 @@ var IndexView = BaseView.extend({
       );
     }
 
+    else if (message.type == "ball") {
+      // Scale based on the user's phone dimensions
+      message.x *= (this.width / message.screen.width);
+      message.y *= (this.height / message.screen.height);
+      console.log(message);
+      message.y /= 2;
+      // translate to bottom half of screen
+      if (message.player === 1) {
+        message.y += (this.height + MIDWAY_HEIGHT) / 2;
+      } else {
+        message.y -= MIDWAY_HEIGHT;
+      }
+      this.createBall(
+        message.x,
+        message.y,
+        message.vx,
+        message.vy,
+        message.color
+      );
+    }
+
     else if (message.type == "stateChange") {
 
       this.state = message.state;
@@ -329,7 +369,7 @@ var IndexView = BaseView.extend({
 
         case "ask_for_intro":
           $("#board").fadeOut('slow');
-          $(".playerStatus").fadeOut('slow');
+          $(".player-status").fadeOut('slow');
           $("#players, #in-colorize").fadeOut('slow', function() {
             $("#ask-for-intro").fadeIn("slow");
           });
@@ -341,7 +381,7 @@ var IndexView = BaseView.extend({
           this.begunSlides = true;
           var that = this;
           $("#board").fadeOut('slow');
-          $(".playerStatus").fadeOut('slow');
+          $(".player-status").fadeOut('slow');
           $("#ask-for-intro").fadeOut('slow', function() {
             that.beginSlides(function() {
               that.sendMessage({type: "introFinished"});
@@ -354,7 +394,7 @@ var IndexView = BaseView.extend({
           break;
 
         case "wait_for_pair":
-          $(".playerStatus").fadeOut('slow');
+          $(".player-status").fadeOut('slow');
           $("#board").fadeOut('slow', function() {
             $("#logo").fadeIn('slow');
             $("#players").fadeIn('slow')
@@ -363,7 +403,7 @@ var IndexView = BaseView.extend({
 
         case "in_colorize":
           $("#board").fadeOut('slow');
-          $(".playerStatus").fadeOut('slow');
+          $(".player-status").fadeOut('slow');
           $("#ask-for-intro").fadeOut('slow', function() {
             $("#in-colorize").fadeIn('slow');
           });
@@ -372,11 +412,18 @@ var IndexView = BaseView.extend({
         case "in_game":
           this.render();
           $("#container").children().fadeOut('slow', function() {
-            $(".playerStatus").show()
-            $("#board").fadeIn('slow');
+            $(".player-status").show()
+            $("#board").fadeIn('slow', function() {
+              $("#themesong")[0].play();
+            });
           });
           break;
 
+      }
+
+      if (message.status != "in_game") {
+          $("#themesong")[0].currentTime = 0;
+          $("#themesong")[0].pause();
       }
 
       this.updateStatus(message.state);

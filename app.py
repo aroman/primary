@@ -62,8 +62,7 @@ class Application(tornado.web.Application):
     def state(self, value):
         self._state = value
         self.publish_state()
-        # logging.info("State changed to {}".format(value))
-        print("State changed to {}".format(value))
+        logging.info("State changed to {}".format(value))
         if value == GameState.in_colorize:
             for player in self.players:
                 player.send_images()

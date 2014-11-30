@@ -24,7 +24,7 @@ class Liaison(object):
         profile = self.graph.get_object("me")
         profile['picture_url'] = self.graph.get_object("me/picture",
             type="large", redirect=False)['data']['url']
-        profile['score'] = str(self.player['score'])
+        profile['score'] = self.player['score']
         return profile
 
     def getPhotoIds(self, after=None):
