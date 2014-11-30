@@ -162,7 +162,7 @@ var IndexView = BaseView.extend({
   // start -> {x: Number, y: Number}
   // end -> {x: Number, y: Number}
   // color -> String
-  createBarrier: function(start, end, color) {
+  createWall: function(start, end, color) {
 
     var distance = Math.sqrt(
       Math.pow((start.x - end.x), 2)
@@ -170,20 +170,20 @@ var IndexView = BaseView.extend({
       Math.pow((start.y - end.y), 2)
     );
 
-    // If the barrier is too big, split it into 
+    // If the wall is too big, split it into 
     // two, recursively
-    if (distance > Engine.MAX_BARRIER_WIDTH) {
+    if (distance > Engine.MAX_WALL_WIDTH) {
       var midPoint = {
         x: (start.x + end.x) / 2,
         y: (start.y + end.y) / 2
       }
-      this.createBarrier(start, midPoint, color);
-      this.createBarrier(midPoint, end, color);
+      this.createWall(start, midPoint, color);
+      this.createWall(midPoint, end, color);
       return;
     }
 
     // Create static body
-    var path = Physics.body('barrier', {
+    var path = Physics.body('wall', {
       x: (start.x + end.x) / 2,
       y: (start.y + end.y) / 2,
       width: distance + devicePixelRatio,
@@ -314,7 +314,7 @@ var IndexView = BaseView.extend({
         message.start.y -= MIDWAY_HEIGHT;
         message.end.y -= MIDWAY_HEIGHT;
       }
-      this.createBarrier(
+      this.createWall(
         message.start,
         message.end,
         message.color

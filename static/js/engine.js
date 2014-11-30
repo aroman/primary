@@ -6,16 +6,16 @@ var Engine = {
     blue: 0x4A90E2,
   },
 
-  MAX_BARRIER_WIDTH: 50 * devicePixelRatio
+  MAX_WALL_WIDTH: 50 * devicePixelRatio
 
 };
 
-Physics.body('barrier', 'rectangle', function(parent) {
+Physics.body('wall', 'rectangle', function(parent) {
   return {
     init: function(options) {
       options.styles = {
         fillStyle: Engine.colors[options.color],
-        strokeStyle: 0x0,
+        strokeStyle: 0x000,
         lineWidth: 3
       };
       options.treatment = 'static';
