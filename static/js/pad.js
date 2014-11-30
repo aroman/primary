@@ -1,6 +1,6 @@
 // Copyright 2014 Avi Romanoff <avi at romanoff.me>
 
-var ROUNDS = 3;
+var ROUNDS = 1;
 
 var PhotoModel = Backbone.Model.extend({
 
@@ -144,7 +144,7 @@ var ColorizeView = BaseView.extend({
         x: x,
         y: y
       },
-      color: "green"
+      color: "blue"
     });
     this.prevX = x;
     this.prevY = y;
@@ -329,7 +329,6 @@ var ColorizeView = BaseView.extend({
             $("#pad").fadeIn('slow');
           });
           break;
-
 
       }
 

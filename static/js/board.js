@@ -142,6 +142,10 @@ var IndexView = BaseView.extend({
   // end -> {x: Number, y: Number}
   // color -> String
   createBarrier: function(start, end, color) {
+    start.x /= 2;
+    start.y /= 2;
+    end.x /= 2;
+    end.y /= 2;
     var distance = Math.sqrt(
       Math.pow((start.x - end.x), 2)
       +
@@ -283,7 +287,11 @@ var IndexView = BaseView.extend({
     }
 
     if (message.type == "path") {
-      this.createBarrier(message.start, message.end, message.color);
+      this.createBarrier(
+        message.start,
+        message.end,
+        message.color
+      );
     }
 
     else if (message.type == "stateChange") {

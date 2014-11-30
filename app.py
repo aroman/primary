@@ -4,6 +4,7 @@ import os
 import json
 import enum
 import logging
+import collections
 
 import pymongo
 import asyncio
@@ -39,7 +40,7 @@ class Application(tornado.web.Application):
             (r"/socket/board", BoardSocketHandler),
         ]
 
-        self.players = {}
+        self.players = collections.OrderedDict()
         self.board = None
         self._state = GameState.wait_for_player
 
@@ -72,7 +73,7 @@ class Application(tornado.web.Application):
             'type': 'stateChange',
             'state': self.state.name
         }
-        self.broadcast(msg)
+        self.send_to_pads(msg)
         self.send_to_board(msg)
     
     def get_player_profiles(self):
@@ -87,7 +88,7 @@ class Application(tornado.web.Application):
             return
         self.board.write_message(message)
 
-    def broadcast(self, message):
+    def send_to_pads(self, message):
         for socket in self.players.keys():
             socket.write_message(message)
 
@@ -194,6 +195,7 @@ class PadSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
         elif message['type'] == "watchIntro":
             self.application.state = GameState.in_intro
         else:
+            message['player'] = list(self.application.players.keys()).index(self)
             self.application.send_to_board(message)
 
 class BoardSocketHandler(tornado.websocket.WebSocketHandler):
