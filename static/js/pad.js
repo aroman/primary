@@ -73,6 +73,11 @@ var ColorizeView = BaseView.extend({
     this.views = [];
     this.currentColor = "red";
 
+    this.screen = {
+      width: window.innerWidth * devicePixelRatio,
+      height: (window.innerHeight * devicePixelRatio) - 60
+    };
+
     var pad = $("#pad");
     pad.on("mousedown", this.onMouseDown.bind(this));
     pad.on("mousemove", this.onMouseMove.bind(this));
@@ -137,10 +142,7 @@ var ColorizeView = BaseView.extend({
     this.runningDistance = 0;
     this.sendMessage({
       type: 'wall',
-      screen: {
-        width: window.innerWidth * devicePixelRatio,
-        height: window.innerHeight * devicePixelRatio
-      },
+      screen: this.screen,
       start: {
         x: this.prevX,
         y: this.prevY
@@ -177,10 +179,7 @@ var ColorizeView = BaseView.extend({
     else if (event.touches.length === 2) {
       this.sendMessage({
         type: 'ball',
-        screen: {
-          width: window.innerWidth * devicePixelRatio,
-          height: window.innerHeight * devicePixelRatio
-        },
+        screen: this.screen,
         x: event.touches[0].clientX,
         y: event.touches[0].clientY,
         vx: -1,
