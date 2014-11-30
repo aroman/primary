@@ -7,8 +7,8 @@ var IndexView = BaseView.extend({
     BaseView.prototype.initialize.call(this);
 
     // Physics stuff
-    var width = window.innerWidth * devicePixelRatio;
-    var height = window.innerHeight * devicePixelRatio;
+    var width = (window.innerWidth * devicePixelRatio);
+    var height = (window.innerHeight * devicePixelRatio) - 120;
     this.world = Physics();
     this.renderer = Physics.renderer('pixi', {
       el: "board",
@@ -26,16 +26,16 @@ var IndexView = BaseView.extend({
     this.world.add(Physics.behavior('body-collision-detection'));
     this.world.add(Physics.behavior('sweep-prune'));
 
-    ["green", "blue", "blue", "blue","green","red","green","red","green","red","green","red","green","red","green", "red", "blue"].forEach(function (color) {
-      var ball = Physics.body('ball', {
-        x: width * Math.random(),
-        y: height * Math.random(),
-        vy: 1 * Math.random(),
-        vx: -1 * Math.random(),
-        color: color
-      });
-      this.world.add(ball);
-    }, this);
+    // ["green", "blue", "blue", "blue","green","red","green","red","green","red","green","red","green","red","green", "red", "blue"].forEach(function (color) {
+    //   var ball = Physics.body('ball', {
+    //     x: width * Math.random(),
+    //     y: height * Math.random(),
+    //     vy: 1 * Math.random(),
+    //     vx: -1 * Math.random(),
+    //     color: color
+    //   });
+    //   this.world.add(ball);
+    // }, this);
 
     this.world.on('collisions:detected', this.onCollisions.bind(this));
     this.world.on('step', this.onStep.bind(this));
@@ -45,7 +45,8 @@ var IndexView = BaseView.extend({
     Physics.util.ticker.start();
 
     // Compile templates
-    this.playerTemplate = Hogan.compile($("#player-template").html());
+    this.playerAvatarTemplate = Hogan.compile($("#player-avatar-template").html());
+    this.playerStatusTemplate = Hogan.compile($("#player-status-template").html());
 
     if (_.isEmpty(existingProfiles)) {
       this.players = [null, null];
@@ -55,24 +56,26 @@ var IndexView = BaseView.extend({
     this.render();
   },
 
-  render: function () {
-    this.players.forEach(function(profile, i) {
-      if (_.isNull(profile)) {
-        var profile = {
-          first_name: "Player " + String(i + 1),
-          picture_url: "http://i.imgur.com/2CIgGqF.png",
-        };
-      }
-      var html = this.playerTemplate.render(profile);
-      this.$("#player-" + String(i + 1)).html(html);
-    }, this);
-
-    if (this.players.length == 2 && _.every(this.players)) {
-      // Uh...
-    } else {
-      this.$(".slide, .byline, #tap-to-continue, #slide-2 > img").hide();
-      this.$("#players").show();
+  render: function() {
+    if (this.state == 'in_game') {
+      this.players.forEach(function(profile, i) {
+        var html = this.playerStatusTemplate.render(profile);
+        this.$("#player-status-" + String(i + 1)).html(html);
+      }, this);
     }
+    else {
+      this.players.forEach(function(profile, i) {
+        if (_.isNull(profile)) {
+          var profile = {
+            first_name: "Player " + String(i + 1),
+            picture_url: "http://i.imgur.com/2CIgGqF.png",
+          };
+        }
+        var html = this.playerAvatarTemplate.render(profile);
+        this.$("#player-avatar-" + String(i + 1)).html(html);
+      }, this);
+    }
+
   },
 
   onTick: function(time, dt) {
@@ -147,7 +150,7 @@ var IndexView = BaseView.extend({
 
     // If the barrier is too big, split it into 
     // two, recursively
-    if (distance > MAX_BARRIER_WIDTH) {
+    if (distance > Engine.MAX_BARRIER_WIDTH) {
       var midPoint = {
         x: (start.x + end.x) / 2,
         y: (start.y + end.y) / 2
@@ -279,12 +282,19 @@ var IndexView = BaseView.extend({
       this.render();
     }
 
+    if (message.type == "path") {
+      this.createBarrier(message.start, message.end, message.color);
+    }
+
     else if (message.type == "stateChange") {
 
+      this.state = message.state;
       switch (message.state) {
+
 
         case "ask_for_intro":
           $("#board").fadeOut('slow');
+          $(".playerStatus").fadeOut('slow');
           $("#players, #in-colorize").fadeOut('slow', function() {
             $("#ask-for-intro").fadeIn("slow");
           });
@@ -296,7 +306,8 @@ var IndexView = BaseView.extend({
           this.begunSlides = true;
           var that = this;
           $("#board").fadeOut('slow');
-          $("#ask-for-intro").fadeOut('slow', function () {
+          $(".playerStatus").fadeOut('slow');
+          $("#ask-for-intro").fadeOut('slow', function() {
             that.beginSlides(function() {
               that.sendMessage({type: "introFinished"});
               this.begunSlides = false;
@@ -308,17 +319,25 @@ var IndexView = BaseView.extend({
           break;
 
         case "wait_for_pair":
+          $(".playerStatus").fadeOut('slow');
+          $("#board").fadeOut('slow', function() {
+            $("#logo").fadeIn('slow');
+            $("#players").fadeIn('slow')
+          });
           break;
 
         case "in_colorize":
           $("#board").fadeOut('slow');
-          $("#ask-for-intro").fadeOut('slow', function () {
+          $(".playerStatus").fadeOut('slow');
+          $("#ask-for-intro").fadeOut('slow', function() {
             $("#in-colorize").fadeIn('slow');
           });
           break;
 
         case "in_game":
-          $("#container").children().fadeOut('slow', function () {
+          this.render();
+          $("#container").children().fadeOut('slow', function() {
+            $(".playerStatus").show()
             $("#board").fadeIn('slow');
           });
           break;

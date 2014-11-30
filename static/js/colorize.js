@@ -81,31 +81,21 @@ var ColorizeView = BaseView.extend({
       aabb: Physics.aabb(0, 0, width, height)
     });
     this.world.add(edgeBounce);
-    this.world.add(Physics.behavior('body-impulse-response', {
-      check: 'collisions:desired'
-    }));
     this.world.add(Physics.behavior('body-collision-detection'));
     this.world.add(Physics.behavior('sweep-prune'));
 
-    ["green", "blue", "blue", "blue","green","red","green","red","green","red","green","red","green","red","green", "red", "blue"].forEach(function (color) {
-      var ball = Physics.body('ball', {
-        x: width * Math.random(),
-        y: height * Math.random(),
-        vy: 1 * Math.random(),
-        vx: -1 * Math.random(),
-        color: color
-      });
-      this.world.add(ball);
-    }, this);
-
-    this.world.on('collisions:detected', this.onCollisions.bind(this));
     this.world.on('step', this.onStep.bind(this));
     Physics.util.ticker.on(this.onTick.bind(this));
+
+    var canvas = this.world.renderer().el;
+
+    canvas.onmousedown = this.onMouseDown.bind(this);
+    canvas.onmousemove = this.onMouseMove.bind(this);
+    canvas.onmouseup = this.onMouseUp.bind(this);
 
     // start the ticker
     Physics.util.ticker.start();
   },
-
 
   onTick: function(time, dt) {
     this.world.step(time);
@@ -115,56 +105,53 @@ var ColorizeView = BaseView.extend({
     this.world.render();
   },
 
-  onCollisions: function(data) {
+  onMouseDown: function(event) {
+    this.prevX = event.clientX * devicePixelRatio;
+    this.prevY = (event.clientY - $("body").scrollTop()) * devicePixelRatio;
+    this.dragStarted = true;
+  },
 
-    data.collisions.forEach(potentialCollision, this);
+  onMouseMove: function(event) {
+    if (!this.dragStarted) return;
+    var x = event.clientX * devicePixelRatio;
+    var y = (event.clientY - $("body").scrollTop()) * devicePixelRatio;
 
-    function emitCollision(collision) {
-      this.world.emit("collisions:desired", {collisions: [collision]});
+    var distance = Math.sqrt(Math.pow((this.prevX - x), 2) + Math.pow((this.prevY - y), 2));
+    this.runningDistance += distance;
+    if (this.runningDistance < 500) return;
+    this.runningDistance = 0;
+    var path = Physics.body('barrier', {
+      x: (this.prevX + x) / 2,
+      y: (this.prevY + y) / 2,
+      width: distance + devicePixelRatio,
+      height: 10,
+      color: 'blue'
+    });
+
+    var adjacent = this.prevX - x;
+    if (y > this.prevY) {
+      adjacent = -adjacent;
     }
+    path.state.angular.pos = Math.acos(adjacent / distance);
+    this.world.add(path);
+    this.sendMessage({
+      type: 'path',
+      start: {
+        x: this.prevX,
+        y: this.prevY
+      },
+      end: {
+        x: x,
+        y: y
+      },
+      color: "green"
+    });
+    this.prevX = x;
+    this.prevY = y;
+  },
 
-    function potentialCollision(collision) {
-
-      // We hit a screen boundary
-      if (!collision.bodyB.hasOwnProperty("color")) {
-        emitCollision.call(this, collision);
-        return;
-      }
-
-      // We hit another ball
-      if (collision.bodyA.treatment === "dynamic" &&
-          collision.bodyB.treatment === "dynamic") {
-        emitCollision.call(this, collision);
-        return;
-      }
-
-      // Figure out which one is the ball and
-      // which one is the wall.
-      var ball, wall;
-      if (collision.bodyA.treatment === "static") {
-        ball = collision.bodyB;
-        wall = collision.bodyA;
-      } else {
-        ball = collision.bodyA;
-        wall = collision.bodyB;
-      }
-
-      // Break wall
-      if ((ball.color === 'red' && wall.color === 'green') ||
-          (ball.color === 'green' && wall.color === 'blue') ||
-          (ball.color === 'blue' && wall.color === 'red')) {
-            this.world.remove(wall);
-            this.world.remove(ball);
-      }
-      // Pass through
-      else if (ball.color === wall.color) {
-        console.log("Pass through!");
-      }
-      // Bounce
-      else {
-        emitCollision.call(this, collision);
-      }
-    }
+  onMouseUp: function(event) {
+    this.dragStarted = false;
   },
 
   // start -> {x: Number, y: Number}
@@ -271,11 +258,6 @@ var ColorizeView = BaseView.extend({
   onSocketMessage: function(message) {
     if ("images" in message) {
       var that = this;
-      this.$("#wait-for-opponent").fadeOut("slow");
-      this.$("#skip-intro").fadeOut("slow");
-      this.$("#watch-intro").fadeOut("slow", function () {
-        that.$("#compare").fadeIn("slow");
-      });
       // remove any previous views we might have
       this.views.forEach(function(view) {
         view.remove();
@@ -318,6 +300,14 @@ var ColorizeView = BaseView.extend({
 
           $("#skip-intro").fadeIn("slow");
           $("#watch-intro").fadeIn("slow");
+          break;
+
+        case "in_colorize":
+          $("#wait-for-opponent").fadeOut("slow");
+          $("#skip-intro").fadeOut("slow");
+          $("#watch-intro, #skip-intro, #wait-for-opponent").fadeOut("slow", function () {
+            $("#compare").fadeIn("slow");
+          });
           break;
 
         case "in_intro":
