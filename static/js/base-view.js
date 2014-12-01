@@ -16,13 +16,8 @@ var BaseView = Backbone.View.extend({
     this.socket.onmessage = this._onSocketMessage.bind(this);
   },
 
-  _annotateTitle: function(annotation) {
-    window.document.title = "PRIMARY [" + annotation + "]"; 
-  },
-
   updateStatus: function(status) {
     this.$("#status").text(status);
-    // this._annotateTitle(status);
   },
 
   sendMessage: function(message) {

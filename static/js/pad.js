@@ -1,12 +1,5 @@
 // Copyright 2014 Avi Romanoff <avi at romanoff.me>
 
-var ROUNDS = 3;
-var WALL_COST = 3;
-var BALL_COST = 3;
-var REGEN_INCREMENT = 0.5;
-var REGEN_DELAY = 1000;
-var MIN_WALL_WIDTH = 400 * devicePixelRatio;
-
 var PhotoModel = Backbone.Model.extend({
 
 });
@@ -28,7 +21,7 @@ var PhotoView = Backbone.View.extend({
     this.$(".original").hide();
     this.$(".colorized").show();
     window.view.addLevels(this.model.get('levels'));
-    if (window.view.levels.red.values.length < (ROUNDS + 1)) {
+    if (window.view.levels.red.values.length < (Engine.ROUNDS + 1)) {
       window.view.getImages();
     } else {
       // Give the user a bit to see the final colorization
@@ -86,14 +79,15 @@ var ColorizeView = BaseView.extend({
     pad.on("touchmove", this.onTouchMove.bind(this));
     pad.on("touchend", this.onTouchEnd.bind(this));
     pad.on("contextmenu", this.onContextMenu.bind(this));
-    $(window).on('orientationchange', this.onOrientationChange.bind(this));
+    $(window).on('orientationchange', this.onDimensionsChange.bind(this));
+    $(window).on('resize', this.onDimensionsChange.bind(this));
 
     setInterval(
       this.regenerateColors.bind(this),
-      REGEN_DELAY
+      Engine.REGEN_DELAY
     );
     this.updateAction();
-    this.onOrientationChange();
+    this.onDimensionsChange();
   },
 
   onTick: function(time, dt) {
@@ -120,14 +114,14 @@ var ColorizeView = BaseView.extend({
       var event = event.originalEvent;
     }
     if (!this.dragStarted) return;
-    if (this.levels[this.currentColor].current < WALL_COST) return;
+    if (this.levels[this.currentColor].current < Engine.WALL_COST) return;
     var x = event.clientX * devicePixelRatio;
     var y = (event.clientY - $("body").scrollTop()) * devicePixelRatio;
 
     var distance = Math.sqrt(Math.pow((this.prevX - x), 2) + Math.pow((this.prevY - y), 2));
     this.runningDistance += distance;
-    if (this.runningDistance < MIN_WALL_WIDTH) return;
-    this.levels[this.currentColor].current -= WALL_COST;
+    if (this.runningDistance < Engine.MIN_WALL_WIDTH) return;
+    this.levels[this.currentColor].current -= Engine.WALL_COST;
     this.runningDistance = 0;
     if (this.actionMode == "wall") {
       this.sendMessage({
@@ -190,7 +184,7 @@ var ColorizeView = BaseView.extend({
     this.onMouseUp(event.touches[0]);
   },
 
-  onOrientationChange: function() {
+  onDimensionsChange: function() {
 
     this.screen = {
       width: window.innerWidth * devicePixelRatio,
@@ -233,7 +227,7 @@ var ColorizeView = BaseView.extend({
       var level = this.levels[color];
       if (level.current < level.max) {
         var scaleFactor = 1 + (level.max / 100);
-        level.current += REGEN_INCREMENT * scaleFactor;
+        level.current += Engine.REGEN_INCREMENT * scaleFactor;
         changed = true;
       }
     }, this);

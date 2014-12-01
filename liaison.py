@@ -6,7 +6,7 @@ import random
 
 import facebook
 import requests
-from PIL import Image
+import PIL.Image
 
 import color
 
@@ -52,9 +52,9 @@ class Liaison(object):
         randomId = random.choice(self.photoIds)
         res = self.graph.get_object(randomId)
         data = requests.get(res['source']).content
-        original = Image.open(io.BytesIO(data)).convert("RGBA")
+        original = PIL.Image.open(io.BytesIO(data)).convert("RGBA")
         (colorized, levels) = color.colorize(original)
-        
+
         return {
             "id": randomId,
             "levels": levels,
