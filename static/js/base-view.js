@@ -17,7 +17,10 @@ var BaseView = Backbone.View.extend({
   },
 
   updateStatus: function(status) {
-    this.$("#status").text(status);
+    if (status == "disconnected") {
+      status = "<span style='color:red'>" + status + "</span>";
+    }
+    this.$("#status").html(status);
   },
 
   sendMessage: function(message) {
