@@ -31,7 +31,9 @@ var PhotoView = Backbone.View.extend({
     if (window.view.levels.red.values.length < (ROUNDS + 1)) {
       window.view.getImages();
     } else {
-      window.view.startGame();
+      // Give the user a bit to see the final colorization
+      // results before starting the round!
+      _.delay(_.bind(window.view.finishColorize, window.view), 1500);
     }
 
     // Prevent other PhotoView's events from delegating,
@@ -87,6 +89,7 @@ var ColorizeView = BaseView.extend({
     pad.on("touchstart", this.onTouchStart.bind(this));
     pad.on("touchmove", this.onTouchMove.bind(this));
     pad.on("touchend", this.onTouchEnd.bind(this));
+    pad.on("contextmenu", this.nextColor.bind(this));
 
     setInterval(
       this.regenerateColors.bind(this),
@@ -302,8 +305,8 @@ var ColorizeView = BaseView.extend({
     this.sendMessage({type: "getImages"});
   },
 
-  startGame: function() {
-    this.sendMessage({type: "startGame"});
+  finishColorize: function() {
+    this.sendMessage({type: "finishedColorize"});
   },
 
   nextColor: function() {
@@ -314,7 +317,7 @@ var ColorizeView = BaseView.extend({
   },
 
   onSocketMessage: function(message) {
-    if ("images" in message) {
+    if (message.type == "colorized") {
       var that = this;
       // remove any previous views we might have
       this.views.forEach(function(view) {
@@ -352,20 +355,22 @@ var ColorizeView = BaseView.extend({
           break;
 
         case "ask_for_intro":
-          $("#pad").fadeOut('slow');
-          $("#wait-for-opponent").fadeOut("slow");
-          $("#compare").fadeOut("slow");
-
-          $("#skip-intro").fadeIn("slow");
-          $("#watch-intro").fadeIn("slow");
+          $("#pad, #action, #wait-for-opponent, #compare").fadeOut('slow');
+          _.delay(function() {
+            $("#skip-intro, #watch-intro").fadeIn("slow");
+          }, 700);
           break;
 
         case "in_colorize":
-          $("#wait-for-opponent").fadeOut("slow");
-          $("#skip-intro").fadeOut("slow");
-          $("#watch-intro, #skip-intro, #wait-for-opponent").fadeOut("slow", function () {
+          $("#watch-intro, #skip-intro, #wait-for-opponent").fadeOut("slow");
+          // We're using _.delay and not passing a callback to the 
+          // fadeOut call above because it won't fire if some of the
+          // targetted elements are already hidden, which they will be
+          // depending on if we or the other player hit the button.
+          // Therefore, we don't rely on it and use our own delay.
+          _.delay(function() {
             $("#compare").fadeIn("slow");
-          });
+          }, 700);
           break;
 
         case "in_intro":
@@ -383,8 +388,8 @@ var ColorizeView = BaseView.extend({
           break;
 
         case "in_game":
-          $("#container").children().not("#level, #action").fadeOut('slow', function () {
-            $("#pad, #action, #levels").fadeIn('slow');
+          $("#container").children().not("#levels, #action").fadeOut('slow', function () {
+            $("#pad, #action").fadeIn('slow');
           });
           break;
 
@@ -399,11 +404,6 @@ var ColorizeView = BaseView.extend({
   },
 
   skipIntro: function() {
-    this.$("#skip-intro").fadeOut("slow");
-    var that = this;
-    this.$("#watch-intro").fadeOut("slow", function() {
-      that.$("#compare").fadeIn("slow");
-    });
     this.sendMessage({type: "skipIntro"});
   },
 

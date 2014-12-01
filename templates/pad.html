@@ -4,8 +4,9 @@
 <style>
   img.original, img.colorized {
     border-radius: 25px;
-    width: 250px;
-    height: 200px;
+    max-width: 67%;
+    max-height: 80%;
+    height: auto;
     border: 5px solid white;
   }
   img.colorized {
@@ -60,7 +61,8 @@
   .message {
     font-size: 4em;
     font-family: 'Outage';
-    margin-top: 20%;
+    margin-top: 10%;
+    margin-bottom: 10%;
   }
   #wait-for-opponent {
     display: none;
@@ -147,8 +149,8 @@
   </div>
 
   <script id="photo-template" type="text/x-mustache-template">
-    <img class="original" src="/static/generated/{{! id }}.png">
-    <img class="colorized" src="/static/generated/{{! id }}-overlay.png">
+    <img class="original" src="data:image/png;base64,{{! original }}">
+    <img class="colorized" src="data:image/png;base64,{{! colorized }}">
   </script>
 {% end %}
 

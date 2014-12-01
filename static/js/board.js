@@ -27,20 +27,6 @@ var IndexView = BaseView.extend({
     }));
     this.world.add(Physics.behavior('body-collision-detection'));
     this.world.add(Physics.behavior('sweep-prune'));
-    var midWayLine = Physics.body('rectangle', {
-      x: this.width / 2, // wut
-      y: this.height / 2,
-      vx: 1,
-      width: this.width,
-      height: MIDWAY_HEIGHT,
-      treatment: 'static',
-      isMidWay: true,
-      styles: {
-        fillStyle: 0xffffff,
-        alpha: 0.5
-      }
-    });
-    this.world.add(midWayLine);
 
     this.world.on('collisions:detected', this.onCollisions.bind(this));
     this.world.on('step', this.onStep.bind(this));
@@ -59,6 +45,7 @@ var IndexView = BaseView.extend({
       this.players = existingProfiles;
     }
     this.render();
+    this.clearBoard();
   },
 
   render: function() {
@@ -163,6 +150,29 @@ var IndexView = BaseView.extend({
         emitCollision.call(this, collision);
       }
     }
+  },
+
+  clearBoard: function() {
+
+    _.each(this.world.getBodies(), function(body) {
+      this.world.removeBody(body);
+    }, this);
+
+    var midWayLine = Physics.body('rectangle', {
+      x: this.width / 2, // wut
+      y: this.height / 2,
+      vx: 1,
+      width: this.width,
+      height: MIDWAY_HEIGHT,
+      treatment: 'static',
+      isMidWay: true,
+      styles: {
+        fillStyle: 0xffffff,
+        alpha: 0.5
+      }
+    });
+
+    this.world.add(midWayLine);
   },
 
   // start -> {x: Number, y: Number}
@@ -415,6 +425,7 @@ var IndexView = BaseView.extend({
 
         case "in_game":
           this.render();
+          this.clearBoard();
           $("#container").children().fadeOut('slow', function() {
             $(".player-status").show()
             $("#board").fadeIn('slow', function() {

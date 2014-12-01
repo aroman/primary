@@ -22,7 +22,7 @@ var BaseView = Backbone.View.extend({
 
   updateStatus: function(status) {
     this.$("#status").text(status);
-    this._annotateTitle(status);
+    // this._annotateTitle(status);
   },
 
   sendMessage: function(message) {

@@ -127,17 +127,19 @@ class PadHandler(BaseHandler):
 
     @tornado.web.authenticated
     def get(self):
-        if len(self.application.players) == 2:
-            self.write("two players already online; kill one first")
-            return
+        # If we're already connected, disconnect it
+        for socket, player in self.application.players.items():
+            if player.player['_id'] == self.current_user.player['_id']:
+                socket.close()
+                socket.on_close()
         self.render("pad.html")
 
 class BoardHandler(BaseHandler):
 
     def get(self):
+        # If there's already a board socket, close it
         if self.application.board:
-            self.write("board already exists; close it first")
-            return
+            self.application.board.close()
         profiles = self.application.get_player_profiles()
         self.render("board.html", profiles=profiles)
 
@@ -179,6 +181,7 @@ class PadSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
 
     def send_images(self):
         self.write_message({
+            "type": "colorized",
             "images": [self.opponent.getRandomPhoto() for _ in range(2)]
         })
 
@@ -187,8 +190,10 @@ class PadSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
         logging.debug("PlayerSocket@{} message: {}".format(id(self), repr(message)))
         if message['type'] == "getImages":
             self.send_images()
-        elif message['type'] == "startGame":
-            self.application.state = GameState.in_game
+        elif message['type'] == "finishedColorize":
+            self.current_user.finishedColorize = True
+            if self.opponent.finishedColorize:
+                self.application.state = GameState.in_game
         elif message['type'] == "skipIntro":
             self.application.state = GameState.in_colorize
         elif message['type'] == "watchIntro":

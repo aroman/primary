@@ -1,6 +1,7 @@
 # Copyright 2014 Avi Romanoff <avi at romanoff.me>
 
 import io
+import base64
 import random
 
 import facebook
@@ -9,10 +10,18 @@ from PIL import Image
 
 import color
 
+def imageToBase64String(image):
+    # Encode the image and save it to an in-memory buffer
+    buffer = io.BytesIO()
+    image.save(buffer, format="JPEG")
+    # image bytes -> base64 bytes -> utf-8 string
+    return base64.b64encode(buffer.getvalue()).decode("utf-8")
+
 class Liaison(object):
 
     def __init__(self, db, player):
         self.player = player
+        self.finishedColorize = False
         self.graph = facebook.GraphAPI(player['access_token'])
         if 'photo_ids' in player:
             self.photoIds = player['photo_ids']
@@ -43,11 +52,12 @@ class Liaison(object):
         randomId = random.choice(self.photoIds)
         res = self.graph.get_object(randomId)
         data = requests.get(res['source']).content
-        orig = Image.open(io.BytesIO(data)).convert("RGBA")
-        (overlay, levels) = color.colorize(orig)
-        orig.save("./static/generated/" + randomId + ".png")
-        overlay.save("./static/generated/" + randomId + "-overlay.png")
+        original = Image.open(io.BytesIO(data)).convert("RGBA")
+        (colorized, levels) = color.colorize(original)
+        
         return {
             "id": randomId,
-            "levels": levels
+            "levels": levels,
+            "original": imageToBase64String(original),
+            "colorized": imageToBase64String(colorized),
         }

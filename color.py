@@ -24,7 +24,7 @@ def colorize(image):
 	def isRed(r, g, b, a):
 		return r > (g + b) * 0.65
 
-	newImgData = []
+	colorizedData = []
 	transparentPixel = (255, 255, 255, 0)
 	(width, height) = image.size
 	rSum = gSum = bSum = 0
@@ -32,24 +32,24 @@ def colorize(image):
 		for x in range(width):
 			pixel = image.getpixel((x,y))
 			if isBlackish(*pixel) or isWhiteish(*pixel):
-				newImgData.append(transparentPixel)
+				colorizedData.append(transparentPixel)
 			elif isBlue(*pixel):
 				bSum += 1
-				newImgData.append((0, 0, 255))
+				colorizedData.append((0, 0, 255))
 			elif isGreen(*pixel):
 				gSum += 1
-				newImgData.append((0, 255, 0))
+				colorizedData.append((0, 255, 0))
 			elif isRed(*pixel):
 				rSum += 1
-				newImgData.append((255, 0, 0))
+				colorizedData.append((255, 0, 0))
 			else:
-				newImgData.append(transparentPixel)
+				colorizedData.append(transparentPixel)
 
 	total = rSum + gSum + bSum
 
 	print("making new image with mode", image.mode)
-	newImg = Image.new(image.mode, image.size)
-	newImg.putdata(newImgData)
+	colorized = Image.new(image.mode, image.size)
+	colorized.putdata(colorizedData)
 
 	# image was grayscale
 	if total == 0:
@@ -65,4 +65,4 @@ def colorize(image):
 			'blue': round(bSum / total * 100)
 		}
 
-	return (newImg, levels)
+	return (colorized, levels)
