@@ -75,6 +75,9 @@ var IndexView = BaseView.extend({
             first_name: "Player " + String(i + 1),
             picture_url: "http://i.imgur.com/2CIgGqF.png",
           };
+        } else {
+          // we always want to show a user's score, even if it's 0
+          // profile.score = String(profile.score);
         }
         var html = this.playerAvatarTemplate.render(profile);
         this.$("#player-avatar-" + String(i + 1)).html(html);
@@ -266,7 +269,7 @@ var IndexView = BaseView.extend({
     ];
 
     function showSlide(slide, next) {
-      $("#banner").fadeOut("slow", function () {
+      $("#logo").fadeOut("slow", function () {
         var classes = "animated fadeIn"; 
         slide.show();
         async.eachSeries(slide.children(), function(el, cont) {
@@ -380,6 +383,7 @@ var IndexView = BaseView.extend({
           if (this.begunSlides) return;
           this.begunSlides = true;
           var that = this;
+          $("#slides").show();
           $("#board").fadeOut('slow');
           $(".player-status").fadeOut('slow');
           $("#ask-for-intro").fadeOut('slow', function() {
@@ -394,8 +398,8 @@ var IndexView = BaseView.extend({
           break;
 
         case "wait_for_pair":
-          $(".player-status").fadeOut('slow');
-          $("#board").fadeOut('slow', function() {
+          $(".player-status").fadeOut('slowz');
+          $("#board, #slides").fadeOut('slow', function() {
             $("#logo").fadeIn('slow');
             $("#players").fadeIn('slow')
           });

@@ -11,9 +11,9 @@ import asyncio
 import colorama
 import facebook
 import tornado.web
+import tornado.ioloop
 import tornado.options
 import tornado.websocket
-import tornado.platform.asyncio
 
 from liaison import Liaison
 
@@ -219,7 +219,6 @@ class BoardSocketHandler(tornado.websocket.WebSocketHandler):
             self.application.state = GameState.in_intro
 
 if __name__ == "__main__":
-    tornado.platform.asyncio.AsyncIOMainLoop().install()
     tornado.options.parse_command_line()
     if 'PORT' in os.environ:
         port = os.environ['PORT']
@@ -234,4 +233,4 @@ if __name__ == "__main__":
     )
     logging.info(R + "PRI" + G + "MA" + B + "RY" + X + 
         " listening on http://127.0.0.1:" + str(port) + X)
-    asyncio.get_event_loop().run_forever()
+    tornado.ioloop.IOLoop.current().start()

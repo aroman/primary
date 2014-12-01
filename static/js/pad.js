@@ -1,8 +1,8 @@
 // Copyright 2014 Avi Romanoff <avi at romanoff.me>
 
-var ROUNDS = 1;
-var WALL_COST = 4;
-var BALL_COST = 5;
+var ROUNDS = 3;
+var WALL_COST = 2;
+var BALL_COST = 3;
 var REGEN_INCREMENT = 1;
 var REGEN_DELAY = 2000;
 var MIN_WALL_WIDTH = 400 * devicePixelRatio;
@@ -61,6 +61,7 @@ var ColorizeView = BaseView.extend({
     "click #next-slide": "nextSlide",
     "click #skip-intro": "skipIntro",
     "click #watch-intro": "watchIntro",
+    "click #action": "onAction",
   },
 
   initialize: function() {
@@ -72,6 +73,7 @@ var ColorizeView = BaseView.extend({
     this.resetLevels();
     this.views = [];
     this.currentColor = "red";
+    this.actionMode = "wall";
 
     this.screen = {
       width: window.innerWidth * devicePixelRatio,
@@ -90,6 +92,7 @@ var ColorizeView = BaseView.extend({
       this.regenerateColors.bind(this),
       REGEN_DELAY
     );
+    this.updateAction();
   },
 
   onTick: function(time, dt) {
@@ -105,7 +108,7 @@ var ColorizeView = BaseView.extend({
     _.each(_.keys(this.levels), function(color) {
       var level = this.levels[color];
       if (level.current < level.max) {
-        var scaleFactor = 1 + (level.current / 100);
+        var scaleFactor = 1 + (level.max / 100);
         level.current += REGEN_INCREMENT * scaleFactor;
         changed = true;
       }
@@ -140,19 +143,31 @@ var ColorizeView = BaseView.extend({
     if (this.runningDistance < MIN_WALL_WIDTH) return;
     this.levels[this.currentColor].current -= WALL_COST;
     this.runningDistance = 0;
-    this.sendMessage({
-      type: 'wall',
-      screen: this.screen,
-      start: {
-        x: this.prevX,
-        y: this.prevY
-      },
-      end: {
+    if (this.actionMode == "wall") {
+      this.sendMessage({
+        type: 'wall',
+        screen: this.screen,
+        start: {
+          x: this.prevX,
+          y: this.prevY
+        },
+        end: {
+          x: x,
+          y: y
+        },
+        color: this.currentColor
+      });
+    } else {
+      this.sendMessage({
+        type: 'ball',
+        screen: this.screen,
         x: x,
-        y: y
-      },
-      color: this.currentColor
-    });
+        y: y,
+        vx: 0,
+        vy: 0,
+        color: this.currentColor
+      });
+    }
     this.prevX = x;
     this.prevY = y;
     this.renderLevels();
@@ -168,6 +183,9 @@ var ColorizeView = BaseView.extend({
     if (event.touches.length == 1) {
       this.onMouseDown(event.touches[0]);
     }
+    else if (event.touches.length === 2) {
+      this.nextColor();
+    }
   },
 
   onTouchMove: function(event) {
@@ -175,20 +193,6 @@ var ColorizeView = BaseView.extend({
     var event = event.originalEvent;
     if (event.touches.length === 1) {
       this.onMouseMove(event.touches[0]);
-    }
-    else if (event.touches.length === 2) {
-      this.sendMessage({
-        type: 'ball',
-        screen: this.screen,
-        x: event.touches[0].clientX,
-        y: event.touches[0].clientY,
-        vx: -1,
-        vy: 0,
-        color: this.currentColor
-      });
-    }
-    else {
-      alert("gesture unsupported");
     }
   },
 
@@ -198,6 +202,15 @@ var ColorizeView = BaseView.extend({
       alert("Multitouch not implemented");
     }
     this.onMouseUp(event.touches[0]);
+  },
+
+  onAction: function() {
+    if (this.actionMode == "ball") {
+      this.actionMode = "wall";
+    } else {
+      this.actionMode = "ball"
+    }
+    this.updateAction();
   },
 
   resetLevels: function() {
@@ -272,12 +285,32 @@ var ColorizeView = BaseView.extend({
     });
   },
 
+  updateAction: function() {
+    if (this.actionMode == "wall") {
+      $("#action").text("BUILD");
+    }
+    else if (this.actionMode == "ball") {
+      $("#action").text("FIRE!");
+    } else {
+      throw (this.actionMode + " is an invalid action mode");
+    }
+    $("#action").removeClass("action-red action-blue action-green")
+    $("#action").addClass("action-" + this.currentColor);
+  },
+
   getImages: function() {
     this.sendMessage({type: "getImages"});
   },
 
   startGame: function() {
     this.sendMessage({type: "startGame"});
+  },
+
+  nextColor: function() {
+    var colors = _.keys(view.levels);
+    var newIndex = (colors.indexOf(view.currentColor) + 1) % colors.length;
+    this.currentColor = _.keys(view.levels)[newIndex]
+    this.updateAction();
   },
 
   onSocketMessage: function(message) {
@@ -350,8 +383,8 @@ var ColorizeView = BaseView.extend({
           break;
 
         case "in_game":
-          $("#container").children().not("#levels").fadeOut('slow', function () {
-            $("#pad").fadeIn('slow');
+          $("#container").children().not("#level, #action").fadeOut('slow', function () {
+            $("#pad, #action, #levels").fadeIn('slow');
           });
           break;
 
