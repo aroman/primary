@@ -326,6 +326,9 @@ var ColorizeView = BaseView.extend({
   },
 
   finishColorize: function() {
+    $("#compare").fadeOut('slow', function() {
+      $("#wait-for-opponent").fadeIn('slow');
+    });
     this.sendMessage({type: "finishedColorize"});
   },
 

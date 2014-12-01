@@ -11,6 +11,7 @@ var Engine = {
   ROUNDS: 3,
   WALL_COST: 3,
   BALL_COST: 3,
+  MIDWAY_HEIGHT: 20,
   REGEN_DELAY: 1000,
   REGEN_INCREMENT: 0.5,
   MAX_WALL_WIDTH: 50 * devicePixelRatio,

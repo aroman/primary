@@ -1,7 +1,5 @@
 // Copyright 2014 Avi Romanoff <avi at romanoff.me>
 
-var MIDWAY_HEIGHT = 20;
-
 var IndexView = BaseView.extend({
 
   initialize: function() {
@@ -163,7 +161,7 @@ var IndexView = BaseView.extend({
       y: this.height / 2,
       vx: 1,
       width: this.width,
-      height: MIDWAY_HEIGHT,
+      height: Engine.MIDWAY_HEIGHT,
       treatment: 'static',
       isMidWay: true,
       styles: {
@@ -340,11 +338,11 @@ var IndexView = BaseView.extend({
       message.end.y /= 2;
       // translate to bottom half of screen
       if (message.player === 1) {
-        message.start.y += (this.height + MIDWAY_HEIGHT) / 2;
-        message.end.y += (this.height + MIDWAY_HEIGHT) / 2;
+        message.start.y += (this.height + Engine.MIDWAY_HEIGHT) / 2;
+        message.end.y += (this.height + Engine.MIDWAY_HEIGHT) / 2;
       } else {
-        message.start.y -= MIDWAY_HEIGHT;
-        message.end.y -= MIDWAY_HEIGHT;
+        message.start.y -= Engine.MIDWAY_HEIGHT;
+        message.end.y -= Engine.MIDWAY_HEIGHT;
       }
       this.createWall(
         message.start,
@@ -361,9 +359,9 @@ var IndexView = BaseView.extend({
       message.y /= 2;
       // translate to bottom half of screen
       if (message.player === 1) {
-        message.y += (this.height + MIDWAY_HEIGHT) / 2;
+        message.y += (this.height + Engine.MIDWAY_HEIGHT) / 2;
       } else {
-        message.y -= MIDWAY_HEIGHT;
+        message.y -= Engine.MIDWAY_HEIGHT;
       }
       this.createBall(
         message.x,
