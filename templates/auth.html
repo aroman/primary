@@ -4,16 +4,14 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <style>
-  #taptologin {
-      position: absolute;
-      top: 0px;
-      left: 0;
-      bottom: 0px;
-      right: 0px;
-      margin: 10%;
-  }
-  #fbicon {
-    height: 100%;
+  #facebook {
+    position: absolute;
+    top: 0px;
+    left: 0;
+    bottom: 0px;
+    right: 0px;
+    height: 50%;
+    margin: auto;
   }
   form {
     display: none;
@@ -23,13 +21,11 @@
 
 {% block body %}
 
-<div id="taptologin">
-  <img id="fbicon" src="/static/img/taptologin.svg">
-</div>
+<img id="facebook" src="/static/img/facebook.svg">
 
 <form method="POST">
-  <input type="text" name="access_token">
-  <input type="text" name="expires_in">
+  <input type="hidden" name="access_token">
+  <input type="hidden" name="expires_in">
 </form>
 
 {% end %}
@@ -38,14 +34,14 @@
 
 <script>
 
-  $("#taptologin").on('click', function(event) {
+  $("#facebook").on('click', function(event) {
     FB.login(function(response) {
       if (response.authResponse) {
           window.location.reload();
       } else {
-          alert("Why'd you cancel?")
+          alert("PRIMARY needs those permissions :/");
       }
-    }, {scope: 'public_profile,user_photos'});
+    }, {scope: 'public_profile, user_photos'});
   });
 
   window.fbAsyncInit = function() {

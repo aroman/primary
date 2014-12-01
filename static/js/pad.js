@@ -1,10 +1,10 @@
 // Copyright 2014 Avi Romanoff <avi at romanoff.me>
 
 var ROUNDS = 3;
-var WALL_COST = 2;
+var WALL_COST = 3;
 var BALL_COST = 3;
-var REGEN_INCREMENT = 1;
-var REGEN_DELAY = 2000;
+var REGEN_INCREMENT = 0.5;
+var REGEN_DELAY = 1000;
 var MIN_WALL_WIDTH = 400 * devicePixelRatio;
 
 var PhotoModel = Backbone.Model.extend({
@@ -77,11 +77,7 @@ var ColorizeView = BaseView.extend({
     this.currentColor = "red";
     this.actionMode = "wall";
 
-    this.screen = {
-      width: window.innerWidth * devicePixelRatio,
-      height: (window.innerHeight * devicePixelRatio) - 60
-    };
-
+    // Bind events
     var pad = $("#pad");
     pad.on("mousedown", this.onMouseDown.bind(this));
     pad.on("mousemove", this.onMouseMove.bind(this));
@@ -89,13 +85,15 @@ var ColorizeView = BaseView.extend({
     pad.on("touchstart", this.onTouchStart.bind(this));
     pad.on("touchmove", this.onTouchMove.bind(this));
     pad.on("touchend", this.onTouchEnd.bind(this));
-    pad.on("contextmenu", this.nextColor.bind(this));
+    pad.on("contextmenu", this.onContextMenu.bind(this));
+    $(window).on('orientationchange', this.onOrientationChange.bind(this));
 
     setInterval(
       this.regenerateColors.bind(this),
       REGEN_DELAY
     );
     this.updateAction();
+    this.onOrientationChange();
   },
 
   onTick: function(time, dt) {
@@ -104,21 +102,6 @@ var ColorizeView = BaseView.extend({
 
   onStep: function() {
     this.world.render();
-  },
-
-  regenerateColors: function() {
-    var changed = false;
-    _.each(_.keys(this.levels), function(color) {
-      var level = this.levels[color];
-      if (level.current < level.max) {
-        var scaleFactor = 1 + (level.max / 100);
-        level.current += REGEN_INCREMENT * scaleFactor;
-        changed = true;
-      }
-    }, this);
-    if (changed) {
-      this.renderLevels();
-    }
   },
 
   onMouseDown: function(event) {
@@ -207,6 +190,34 @@ var ColorizeView = BaseView.extend({
     this.onMouseUp(event.touches[0]);
   },
 
+  onOrientationChange: function() {
+
+    this.screen = {
+      width: window.innerWidth * devicePixelRatio,
+      height: (window.innerHeight * devicePixelRatio) - 60
+    };
+
+    // Not a mobile device
+    if (!_.has(window, 'orientation')) return;
+
+    switch (window.orientation) {
+      case -90:
+      case 90:
+        // Landscape
+        $("#rotate-nag").fadeOut();
+        break; 
+      default:
+        // Portrait
+        $("#rotate-nag").fadeIn();
+        break; 
+    }
+  },
+
+  onContextMenu: function() {
+    this.nextColor();
+    return false;
+  },
+
   onAction: function() {
     if (this.actionMode == "ball") {
       this.actionMode = "wall";
@@ -214,6 +225,21 @@ var ColorizeView = BaseView.extend({
       this.actionMode = "ball"
     }
     this.updateAction();
+  },
+
+  regenerateColors: function() {
+    var changed = false;
+    _.each(_.keys(this.levels), function(color) {
+      var level = this.levels[color];
+      if (level.current < level.max) {
+        var scaleFactor = 1 + (level.max / 100);
+        level.current += REGEN_INCREMENT * scaleFactor;
+        changed = true;
+      }
+    }, this);
+    if (changed) {
+      this.renderLevels();
+    }
   },
 
   resetLevels: function() {
@@ -388,7 +414,10 @@ var ColorizeView = BaseView.extend({
           break;
 
         case "in_game":
-          $("#container").children().not("#levels, #action").fadeOut('slow', function () {
+          $("#container")
+          .children()
+          .not("#levels, #action, #status")
+          .fadeOut('slow', function () {
             $("#pad, #action").fadeIn('slow');
           });
           break;

@@ -153,10 +153,6 @@ class PadSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
 
     def open(self):
         logging.debug("PlayerSocket@{} opened".format(id(self)))
-        # sanity checks
-        if not self.current_user or len(self.application.players) >= 2:
-            logging.error("YOU SHOULD NOT SEE THIS AT ALL!!! UNWANTED SOCKET!!")
-            raise
         self.application.players[self] = self.current_user
         self.application.send_to_board({
             'type': "playerChange",
