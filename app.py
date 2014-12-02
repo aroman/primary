@@ -218,6 +218,12 @@ class BoardSocketHandler(tornado.websocket.WebSocketHandler):
             self.application.state = GameState.wait_for_slide
         elif message['type'] == "introFinished":
             self.application.state = GameState.in_colorize
+        elif message['type'] == "roundFinished":
+            for player in message['players']:
+                db.players.update({
+                    "_id": player['id'],
+                    {"$set": {"score": player['score']}}
+                })
         elif message['type'] == "watchIntro":
             self.application.state = GameState.in_intro
 

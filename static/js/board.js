@@ -231,7 +231,7 @@ var IndexView = BaseView.extend({
     this.world.add(ball);
   },
 
-  beginSlides: function (callback) {
+  beginSlides: function(callback) {
     var that = this;
 
     function waitForNextSlide(callback) {
@@ -313,6 +313,23 @@ var IndexView = BaseView.extend({
     }
 
     async.series(steps, callback);
+  },
+
+  endRound: function() {
+    var ranks = _.sortBy(this.players, function(player) {
+      return player.score;
+    });
+    alert("Time's up,", ranks[0], "beat", ranks[1], "!");
+    var results = _.map(this.players, function(player) {
+      return {
+        score: player.score,
+        id: player.id
+      }
+    });
+    this.sendMessage({
+      type: "roundFinished",
+      results: results
+    });
   },
 
   onSocketClosed: function() {
@@ -428,9 +445,11 @@ var IndexView = BaseView.extend({
         case "in_game":
           this.render();
           this.clearBoard();
+          var that = this;
           $("#container").children().fadeOut('slow', function() {
             $(".player-status").show()
             $("#board").fadeIn('slow', function() {
+              setTimeout(that.endRound, Engine.ROUND_DURATION);
               // $("#themesong")[0].play();
             });
           });

@@ -21,7 +21,7 @@ var PhotoView = Backbone.View.extend({
     this.$(".original").hide();
     this.$(".colorized").show();
     window.view.addLevels(this.model.get('levels'));
-    if (window.view.levels.red.values.length < (Engine.ROUNDS + 1)) {
+    if (window.view.levels.red.values.length < (Engine.COLORIZE_ROUNDS + 1)) {
       window.view.getImages();
     } else {
       // Give the user a bit to see the final colorization
