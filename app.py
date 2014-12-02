@@ -83,7 +83,7 @@ class Application(tornado.web.Application):
 
     def send_to_board(self, message):
         if not self.board:
-            logging.warn("No board socket connected; send_to_board ->")
+            logging.warn("No board socket connected; send_to_board -> no-op")
             return
         self.board.write_message(message)
 
@@ -194,6 +194,8 @@ class PadSocketHandler(tornado.websocket.WebSocketHandler, BaseHandler):
             self.application.state = GameState.in_colorize
         elif message['type'] == "watchIntro":
             self.application.state = GameState.in_intro
+        elif message['type'] == "heartbeat":
+            pass
         else:
             message['player'] = list(self.application.players.keys()).index(self)
             self.application.send_to_board(message)

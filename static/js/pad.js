@@ -89,8 +89,16 @@ var ColorizeView = BaseView.extend({
       this.regenerateColors.bind(this),
       Engine.REGEN_DELAY
     );
+    setInterval(
+      this.onHeartbeatTimerFired.bind(this),
+      Engine.HEARTBEAT_INTERVAL
+    );
     this.updateAction();
     this.onDimensionsChange();
+  },
+
+  onHeartbeatTimerFired: function() {
+    this.sendMessage({type: "heartbeat"});
   },
 
   onTick: function(time, dt) {
@@ -173,22 +181,6 @@ var ColorizeView = BaseView.extend({
       this.levels[this.currentColor].current -= Engine.WALL_COST;
     }
   },
-
-  // fireBall: function(start, end, color) {
-  //   if (this.levels[color].current < Engine.BALL_COST) return;
-  //   this.sendMessage({
-  //     type: 'ball',
-  //     screen: this.screen,
-  //     x: x,
-  //     y: y,
-  //     vx: 0,
-  //     vy: 0,
-  //     color: color
-  //   });
-  //   this.levels[color].current -= Engine.WALL_COST;
-
-
-  // },
 
   onTouchStart: function(event) {
     event.preventDefault();

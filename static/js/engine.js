@@ -8,14 +8,15 @@ var Engine = {
     blue: 0x4A90E2,
   },
 
-  ROUNDS: 2,
-  WALL_COST: 3,
-  BALL_COST: 3,
-  MIDWAY_HEIGHT: 20,
-  REGEN_DELAY: 1000,
-  REGEN_INCREMENT: 0.5,
-  MAX_WALL_WIDTH: 50 * devicePixelRatio,
-  MIN_WALL_WIDTH: 400 * devicePixelRatio
+  ROUNDS: 2, // <scalar>
+  WALL_COST: 3, // color points 
+  BALL_COST: 3, // color points
+  MIDWAY_HEIGHT: 20, // pixels
+  REGEN_DELAY: 1000, // milliseconds
+  REGEN_INCREMENT: 0.5, // color points
+  HEARTBEAT_INTERVAL: 15000, // milliseconds
+  MAX_WALL_WIDTH: 50 * devicePixelRatio, // pixels
+  MIN_WALL_WIDTH: 400 * devicePixelRatio // pixels
 
 };
 
