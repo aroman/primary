@@ -82,6 +82,9 @@ var ColorizeView = BaseView.extend({
     $(window).on('orientationchange', this.onDimensionsChange.bind(this));
     $(window).on('resize', this.onDimensionsChange.bind(this));
 
+    // Disable 300 ms tap-to-click delay on iOS
+    Origami.fastclick(document.body);
+
     setInterval(
       this.regenerateColors.bind(this),
       Engine.REGEN_DELAY
@@ -113,17 +116,23 @@ var ColorizeView = BaseView.extend({
     if ('originalEvent' in event) {
       var event = event.originalEvent;
     }
+
     if (!this.dragStarted) return;
-    if (this.levels[this.currentColor].current < Engine.WALL_COST) return;
+    
     var x = event.clientX * devicePixelRatio;
     var y = (event.clientY - $("body").scrollTop()) * devicePixelRatio;
+    console.log(x, y);
 
-    var distance = Math.sqrt(Math.pow((this.prevX - x), 2) + Math.pow((this.prevY - y), 2));
-    this.runningDistance += distance;
-    if (this.runningDistance < Engine.MIN_WALL_WIDTH) return;
-    this.levels[this.currentColor].current -= Engine.WALL_COST;
-    this.runningDistance = 0;
     if (this.actionMode == "wall") {
+      if (this.levels[this.currentColor].current < Engine.WALL_COST) return;
+      var distance = Math.sqrt(
+        Math.pow((this.prevX - x), 2)
+        +
+        Math.pow((this.prevY - y), 2)
+      );
+      this.runningDistance += distance;
+      if (this.runningDistance < Engine.MIN_WALL_WIDTH) return;
+      this.runningDistance = 0;
       this.sendMessage({
         type: 'wall',
         screen: this.screen,
@@ -137,25 +146,49 @@ var ColorizeView = BaseView.extend({
         },
         color: this.currentColor
       });
-    } else {
-      this.sendMessage({
-        type: 'ball',
-        screen: this.screen,
-        x: x,
-        y: y,
-        vx: 0,
-        vy: 0,
-        color: this.currentColor
-      });
+      this.levels[this.currentColor].current -= Engine.WALL_COST;
+      this.prevX = x;
+      this.prevY = y;
     }
-    this.prevX = x;
-    this.prevY = y;
+
     this.renderLevels();
   },
 
   onMouseUp: function(event) {
-    this.dragStarted = false;
+    if (this.actionMode == "wall") {
+      this.dragStarted = false;
+    }
+    else if (this.actionMode == "ball") {
+      var x = event.clientX * devicePixelRatio;
+      var y = (event.clientY - $("body").scrollTop()) * devicePixelRatio;
+      if (this.levels[this.currentColor].current < Engine.BALL_COST) return;
+      this.sendMessage({
+        type: 'ball',
+        screen: this.screen,
+        x: x,
+        vx: (x - this.prevX),
+        vy: (y - this.prevY),
+        color: this.currentColor
+      });
+      this.levels[this.currentColor].current -= Engine.WALL_COST;
+    }
   },
+
+  // fireBall: function(start, end, color) {
+  //   if (this.levels[color].current < Engine.BALL_COST) return;
+  //   this.sendMessage({
+  //     type: 'ball',
+  //     screen: this.screen,
+  //     x: x,
+  //     y: y,
+  //     vx: 0,
+  //     vy: 0,
+  //     color: color
+  //   });
+  //   this.levels[color].current -= Engine.WALL_COST;
+
+
+  // },
 
   onTouchStart: function(event) {
     event.preventDefault();
@@ -165,6 +198,8 @@ var ColorizeView = BaseView.extend({
     }
     else if (event.touches.length === 2) {
       this.nextColor();
+    } else {
+      alert("unsupported gesture");
     }
   },
 
@@ -173,15 +208,16 @@ var ColorizeView = BaseView.extend({
     var event = event.originalEvent;
     if (event.touches.length === 1) {
       this.onMouseMove(event.touches[0]);
+    } else {
+      alert("unsupported gesture");
     }
   },
 
   onTouchEnd: function(event) {
     var event = event.originalEvent;
-    if (event.touches.length > 1) {
-      alert("Multitouch not implemented");
+    if (event.touches.length === 0) {
+      this.onMouseUp(event.touches[0]);
     }
-    this.onMouseUp(event.touches[0]);
   },
 
   onDimensionsChange: function() {

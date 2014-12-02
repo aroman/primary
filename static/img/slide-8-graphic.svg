@@ -5,62 +5,35 @@
     <desc>Created with Sketch.</desc>
     <defs>
         <rect id="path-1" x="0" y="0" width="783.047264" height="366.903168" rx="50"></rect>
-        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-3">
-            <feOffset dx="0" dy="0" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
-            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
-            <feColorMatrix values="0 0 0 0 0.816203773   0 0 0 0 0.00751322834   0 0 0 0 0.106696017  0 0 0 0.7 0" in="shadowBlurOuter1" type="matrix" result="shadowMatrixOuter1"></feColorMatrix>
-            <feMerge>
-                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
-                <feMergeNode in="SourceGraphic"></feMergeNode>
-            </feMerge>
-        </filter>
-        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-4">
-            <feOffset dx="0" dy="0" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
-            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
-            <feColorMatrix values="0 0 0 0 0.55587405   0 0 0 0 0.842652082   0 0 0 0 0.167783618  0 0 0 0.7 0" in="shadowBlurOuter1" type="matrix" result="shadowMatrixOuter1"></feColorMatrix>
-            <feMerge>
-                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
-                <feMergeNode in="SourceGraphic"></feMergeNode>
-            </feMerge>
-        </filter>
-        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-5">
-            <feOffset dx="0" dy="0" in="SourceAlpha" result="shadowOffsetOuter1"></feOffset>
-            <feGaussianBlur stdDeviation="2.5" in="shadowOffsetOuter1" result="shadowBlurOuter1"></feGaussianBlur>
-            <feColorMatrix values="0 0 0 0 0.288655698   0 0 0 0 0.56455189   0 0 0 0 0.886238694  0 0 0 0.7 0" in="shadowBlurOuter1" type="matrix" result="shadowMatrixOuter1"></feColorMatrix>
-            <feMerge>
-                <feMergeNode in="shadowMatrixOuter1"></feMergeNode>
-                <feMergeNode in="SourceGraphic"></feMergeNode>
-            </feMerge>
-        </filter>
-        <path id="path-6" d="M-1.13686838e-12,22.3296661 L43.9290052,38.8701595"></path>
+        <path id="path-3" d="M-1.13686838e-12,22.3296661 L43.9290052,38.8701595"></path>
+        <path id="path-4" d="M51.3886475,39.6971842 L101.948446,32.0003871"></path>
+        <path id="path-5" d="M108.579239,28.9458635 L148.6479,-9.09494702e-13"></path>
+        <path id="path-6" d="M-3.41060513e-13,22.3296661 L43.9290052,38.8701595"></path>
         <path id="path-7" d="M51.3886475,39.6971842 L101.948446,32.0003871"></path>
-        <path id="path-8" d="M108.579239,28.9458635 L148.6479,-9.09494702e-13"></path>
-        <path id="path-9" d="M-3.41060513e-13,22.3296661 L43.9290052,38.8701595"></path>
+        <path id="path-8" d="M108.579239,28.9458635 L148.6479,-7.95807864e-13"></path>
+        <path id="path-9" d="M-1.13686838e-12,22.3296661 L43.9290052,38.8701595"></path>
         <path id="path-10" d="M51.3886475,39.6971842 L101.948446,32.0003871"></path>
-        <path id="path-11" d="M108.579239,28.9458635 L148.6479,-7.95807864e-13"></path>
-        <path id="path-12" d="M-1.13686838e-12,22.3296661 L43.9290052,38.8701595"></path>
-        <path id="path-13" d="M51.3886475,39.6971842 L101.948446,32.0003871"></path>
-        <path id="path-14" d="M108.579239,28.9458635 L148.6479,-9.09494702e-13"></path>
-        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-15">
+        <path id="path-11" d="M108.579239,28.9458635 L148.6479,-9.09494702e-13"></path>
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-12">
             <feGaussianBlur stdDeviation="0.227050781 0" in="SourceGraphic" result="blur"></feGaussianBlur>
         </filter>
-        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-16">
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-13">
             <feGaussianBlur stdDeviation="6.35986328 0" in="SourceGraphic" result="blur"></feGaussianBlur>
         </filter>
-        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-17">
+        <filter x="-50%" y="-50%" width="200%" height="200%" filterUnits="objectBoundingBox" id="filter-14">
             <feGaussianBlur stdDeviation="6.35986328 0" in="SourceGraphic" result="blur"></feGaussianBlur>
         </filter>
     </defs>
     <g id="slides" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" sketch:type="MSPage">
-        <g id="slide-8" sketch:type="MSArtboardGroup" transform="translate(-338.000000, -663.000000)">
-            <g id="slide-8-graphic" sketch:type="MSLayerGroup" transform="translate(343.000000, 668.000000)">
+        <g id="slide-8" sketch:type="MSArtboardGroup" transform="translate(-368.000000, -667.000000)">
+            <g id="slide-8-graphic" sketch:type="MSLayerGroup" transform="translate(374.000000, 673.367056)">
                 <g id="Group-3">
-                    <g id="Player-6" transform="translate(0.500000, 0.500000)">
+                    <g id="Player-6" transform="translate(-0.500000, -0.500000)">
                         <g id="color-choose">
                             <g id="iphone">
                                 <g id="Group" transform="translate(-0.022388, -0.071928)" sketch:type="MSShapeGroup">
                                     <rect id="Rectangle-path" stroke="#353535" stroke-width="5" fill="#000000" x="4.98756219" y="5.02607079" width="783.047264" height="366.903168" rx="50"></rect>
-                                    <rect id="border" stroke="#F8E81C" stroke-width="10" x="9.09494702e-13" y="0" width="793.022388" height="376.955309" rx="55"></rect>
+                                    <rect id="border" stroke="#F8E81C" stroke-width="10" x="0" y="0" width="793.022388" height="376.955309" rx="55"></rect>
                                 </g>
                                 <g id="Clipped" transform="translate(4.965174, 4.954143)">
                                     <mask id="mask-2" sketch:name="Rectangle-path" fill="white">
@@ -83,86 +56,65 @@
                         </g>
                     </g>
                 </g>
-                <rect id="Rectangle-88" fill-opacity="0.379047781" fill="#9B9B9B" sketch:type="MSShapeGroup" x="112" y="28" width="567" height="47"></rect>
-                <rect id="Rectangle-6" fill-opacity="0.3" fill="#D0011B" sketch:type="MSShapeGroup" x="116.74033" y="27.8718823" width="278.75967" height="15.7093726"></rect>
-                <rect id="Rectangle-8" fill="#D0011B" sketch:type="MSShapeGroup" x="112.728791" y="27.8718823" width="69.2903979" height="15.7093726"></rect>
-                <rect id="Rectangle-9" fill-opacity="0.3" fill="#8ED72A" sketch:type="MSShapeGroup" x="113.234561" y="43.5812548" width="138.580796" height="15.7093726"></rect>
-                <rect id="Rectangle-10" fill="#8ED72A" sketch:type="MSShapeGroup" x="112.728791" y="43.5812548" width="124.419255" height="15.7093726"></rect>
-                <path d="M113.234561,59.2906274 L113.234561,75 L267.379138,75 L346.394221,75 L346.394221,59.2906274 L113.234561,59.2906274 Z" id="Rectangle-11" fill-opacity="0.3" fill="#4990E2" sketch:type="MSShapeGroup"></path>
-                <rect id="Rectangle-12" fill="#4990E2" sketch:type="MSShapeGroup" x="112.728791" y="59.2906274" width="108.740405" height="15.7093726"></rect>
-                <g id="Oval-23-+-x-+-12" transform="translate(414.500000, 35.000000)">
-                    <ellipse id="Oval-23" fill="#D0011B" filter="url(#filter-3)" sketch:type="MSShapeGroup" cx="12.5" cy="16.5" rx="12.5" ry="12.5"></ellipse>
-                    <text id="x" sketch:type="MSTextLayer" font-family="Outage" font-size="15.1578947" font-weight="bold" fill="#FFFFFF">
-                        <tspan x="29.5" y="20.5">x</tspan>
-                    </text>
-                    <text id="3" sketch:type="MSTextLayer" font-family="Outage" font-size="25.1875" font-weight="bold" fill="#FFFFFF">
-                        <tspan x="47.5" y="23.5">3</tspan>
-                    </text>
+                <rect id="Rectangle-88" fill-opacity="0.4" fill="#9B9B9B" sketch:type="MSShapeGroup" x="111" y="301" width="567" height="47"></rect>
+                <rect id="Rectangle-6" fill-opacity="0.3" fill="#D0011B" sketch:type="MSShapeGroup" x="114.74033" y="300.871882" width="278.75967" height="15.7093726"></rect>
+                <rect id="Rectangle-8" fill="#D0011B" sketch:type="MSShapeGroup" x="110.728791" y="300.871882" width="69.2903979" height="15.7093726"></rect>
+                <rect id="Rectangle-9" fill-opacity="0.3" fill="#8ED72A" sketch:type="MSShapeGroup" x="111.234561" y="316.581255" width="138.580796" height="15.7093726"></rect>
+                <rect id="Rectangle-10" fill="#8ED72A" sketch:type="MSShapeGroup" x="110.728791" y="316.581255" width="124.419255" height="15.7093726"></rect>
+                <path d="M112.234561,332.290627 L112.234561,348 L266.379138,348 L345.394221,348 L345.394221,332.290627 L112.234561,332.290627 Z" id="Rectangle-11" fill-opacity="0.3" fill="#4990E2" sketch:type="MSShapeGroup"></path>
+                <rect id="Rectangle-12" fill="#4990E2" sketch:type="MSShapeGroup" x="110.728791" y="332.290627" width="108.740405" height="15.7093726"></rect>
+                <g id="Line-26-+-Line-39-+-Line-49" transform="translate(552.500000, 238.000000) rotate(-170.000000) translate(-552.500000, -238.000000) translate(478.000000, 218.000000)" stroke-linecap="square">
+                    <g id="Line-26">
+                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-3"></use>
+                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-3"></use>
+                    </g>
+                    <g id="Line-39">
+                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-4"></use>
+                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-4"></use>
+                    </g>
+                    <g id="Line-44">
+                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-5"></use>
+                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-5"></use>
+                    </g>
                 </g>
-                <g id="Oval-23-+-x-+-13" transform="translate(501.500000, 34.500000)">
-                    <ellipse id="Oval-23" fill="#8ED72A" filter="url(#filter-4)" sketch:type="MSShapeGroup" cx="12.5" cy="16.5" rx="12.5" ry="12.5"></ellipse>
-                    <text id="x" sketch:type="MSTextLayer" font-family="Outage" font-size="15.1578947" font-weight="bold" fill="#FFFFFF">
-                        <tspan x="29.5" y="20.5">x</tspan>
-                    </text>
-                    <text id="5" sketch:type="MSTextLayer" font-family="Outage" font-size="25.1875" font-weight="bold" fill="#FFFFFF">
-                        <tspan x="47.5" y="23.5">5</tspan>
-                    </text>
-                </g>
-                <g id="Oval-23-+-x-+-14" transform="translate(590.000000, 34.500000)">
-                    <ellipse id="Oval-23" fill="#4990E2" filter="url(#filter-5)" sketch:type="MSShapeGroup" cx="12.5" cy="16.5" rx="12.5" ry="12.5"></ellipse>
-                    <text id="x" sketch:type="MSTextLayer" font-family="Outage" font-size="15.1578947" font-weight="bold" fill="#FFFFFF">
-                        <tspan x="29.5" y="20.5">x</tspan>
-                    </text>
-                    <text id="13" sketch:type="MSTextLayer" font-family="Outage" font-size="25.1875" font-weight="bold" fill="#FFFFFF">
-                        <tspan x="47.5" y="23.5">13</tspan>
-                    </text>
-                </g>
-                <g id="Line-26-+-Line-39-+-Line-49" transform="translate(553.500000, 239.000000) rotate(-170.000000) translate(-553.500000, -239.000000) translate(479.000000, 219.000000)" stroke-linecap="square">
+                <g id="Line-26-+-Line-39-+-Line-51" transform="translate(452.500000, 172.000000) rotate(-170.000000) translate(-452.500000, -172.000000) translate(378.000000, 152.000000)" stroke-linecap="square">
                     <g id="Line-26">
                         <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-6"></use>
-                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-6"></use>
+                        <use stroke="#D0011B" stroke-width="10.2" xlink:href="#path-6"></use>
                     </g>
                     <g id="Line-39">
                         <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-7"></use>
-                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-7"></use>
+                        <use stroke="#D0011B" stroke-width="10.2" xlink:href="#path-7"></use>
                     </g>
                     <g id="Line-44">
                         <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-8"></use>
-                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-8"></use>
+                        <use stroke="#D0011B" stroke-width="10.2" xlink:href="#path-8"></use>
                     </g>
                 </g>
-                <g id="Line-26-+-Line-39-+-Line-51" transform="translate(453.500000, 173.000000) rotate(-170.000000) translate(-453.500000, -173.000000) translate(379.000000, 153.000000)" stroke-linecap="square">
+                <g id="Line-26-+-Line-39-+-Line-50" transform="translate(377.500000, 238.000000) rotate(-170.000000) translate(-377.500000, -238.000000) translate(303.000000, 218.000000)" stroke-linecap="square">
                     <g id="Line-26">
                         <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-9"></use>
-                        <use stroke="#D0011B" stroke-width="10.2" xlink:href="#path-9"></use>
+                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-9"></use>
                     </g>
                     <g id="Line-39">
                         <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-10"></use>
-                        <use stroke="#D0011B" stroke-width="10.2" xlink:href="#path-10"></use>
+                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-10"></use>
                     </g>
                     <g id="Line-44">
                         <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-11"></use>
-                        <use stroke="#D0011B" stroke-width="10.2" xlink:href="#path-11"></use>
+                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-11"></use>
                     </g>
                 </g>
-                <g id="Line-26-+-Line-39-+-Line-50" transform="translate(378.500000, 239.000000) rotate(-170.000000) translate(-378.500000, -239.000000) translate(304.000000, 219.000000)" stroke-linecap="square">
-                    <g id="Line-26">
-                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-12"></use>
-                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-12"></use>
-                    </g>
-                    <g id="Line-39">
-                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-13"></use>
-                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-13"></use>
-                    </g>
-                    <g id="Line-44">
-                        <use stroke="#000000" stroke-width="17.85" sketch:type="MSShapeGroup" xlink:href="#path-14"></use>
-                        <use stroke="#8ED72A" stroke-width="10.2" xlink:href="#path-14"></use>
-                    </g>
+                <g id="Oval-31-+-Oval-30-+-Oval-31" transform="translate(220.410651, 187.867049) scale(-1, 1) rotate(-100.000000) translate(-220.410651, -187.867049) translate(154.410651, 153.867049)" fill="#4990E2" sketch:type="MSShapeGroup">
+                    <ellipse id="Oval-31" filter="url(#filter-12)" cx="99.7142857" cy="36.2221657" rx="31.9047619" ry="31.8345324"></ellipse>
+                    <ellipse id="Oval-30" fill-opacity="0.5" filter="url(#filter-13)" cx="67.6380952" cy="32.1654676" rx="31.9047619" ry="31.8345324"></ellipse>
+                    <ellipse id="Oval-29" fill-opacity="0.25" filter="url(#filter-14)" cx="31.9047619" cy="32.1654676" rx="31.9047619" ry="31.8345324"></ellipse>
                 </g>
-                <g id="Oval-31-+-Oval-30-+-Oval-31" transform="translate(221.410651, 188.867049) scale(-1, 1) rotate(-100.000000) translate(-221.410651, -188.867049) translate(155.410651, 154.867049)" fill="#4990E2" sketch:type="MSShapeGroup">
-                    <ellipse id="Oval-31" filter="url(#filter-15)" cx="99.7142857" cy="36.2221657" rx="31.9047619" ry="31.8345324"></ellipse>
-                    <ellipse id="Oval-30" fill-opacity="0.5" filter="url(#filter-16)" cx="67.6380952" cy="32.1654676" rx="31.9047619" ry="31.8345324"></ellipse>
-                    <ellipse id="Oval-29" fill-opacity="0.25" filter="url(#filter-17)" cx="31.9047619" cy="32.1654676" rx="31.9047619" ry="31.8345324"></ellipse>
+                <g id="Rectangle-99-+-w-2" transform="translate(554.000000, 305.000000)" stroke="#2D2D2D" stroke-width="2">
+                    <rect id="Rectangle-99" fill="#D0011B" sketch:type="MSShapeGroup" x="0" y="0" width="114" height="40" rx="8"></rect>
+                    <text id="fire!" sketch:type="MSTextLayer" font-family="Outage" font-size="22.5" font-weight="bold" fill="#FFFFFF">
+                        <tspan x="25.08" y="28.2857143">fire!</tspan>
+                    </text>
                 </g>
             </g>
         </g>

@@ -8,7 +8,7 @@ var Engine = {
     blue: 0x4A90E2,
   },
 
-  ROUNDS: 3,
+  ROUNDS: 2,
   WALL_COST: 3,
   BALL_COST: 3,
   MIDWAY_HEIGHT: 20,
@@ -29,6 +29,7 @@ if (_.has(window, 'Physics')) {
           strokeStyle: 0x000,
           lineWidth: 3
         };
+        options.height = 10;
         options.treatment = 'static';
         parent.init.call(this, options);
       }

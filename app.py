@@ -83,7 +83,7 @@ class Application(tornado.web.Application):
 
     def send_to_board(self, message):
         if not self.board:
-            print("NO BOARD, dropping message!")
+            logging.warn("No board socket connected; send_to_board ->")
             return
         self.board.write_message(message)
 

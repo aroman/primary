@@ -201,7 +201,6 @@ var IndexView = BaseView.extend({
       x: (start.x + end.x) / 2,
       y: (start.y + end.y) / 2,
       width: distance + devicePixelRatio,
-      height: 10,
       color: color
     });
 
@@ -222,7 +221,7 @@ var IndexView = BaseView.extend({
     // Create ball
     var ball = Physics.body('ball', {
       x: x,
-      y: x,
+      y: y,
       vx: vx,
       vy: vy,
       color: color
@@ -329,21 +328,23 @@ var IndexView = BaseView.extend({
 
     if (message.type == "wall") {
       // Scale based on the user's phone dimensions
-      message.start.x *= (this.width / message.screen.width );
-      message.start.y *= (this.height / message.screen.height );
+      message.start.x *= (this.width / message.screen.width);
+      message.start.y *= (this.height / message.screen.height);
       message.end.x *= (this.width / message.screen.width);
       message.end.y *= (this.height / message.screen.height);
-      console.log(message);
       message.start.y /= 2;
       message.end.y /= 2;
-      // translate to bottom half of screen
-      if (message.player === 1) {
-        message.start.y += (this.height + Engine.MIDWAY_HEIGHT) / 2;
-        message.end.y += (this.height + Engine.MIDWAY_HEIGHT) / 2;
-      } else {
+
+      // top half of screen
+      if (message.player === 0) {
         message.start.y -= Engine.MIDWAY_HEIGHT;
         message.end.y -= Engine.MIDWAY_HEIGHT;
+      // bottom half of screen
+      } else {
+        message.start.y += (this.height + Engine.MIDWAY_HEIGHT) / 2;
+        message.end.y += (this.height + Engine.MIDWAY_HEIGHT) / 2;
       }
+
       this.createWall(
         message.start,
         message.end,
@@ -354,20 +355,21 @@ var IndexView = BaseView.extend({
     else if (message.type == "ball") {
       // Scale based on the user's phone dimensions
       message.x *= (this.width / message.screen.width);
-      message.y *= (this.height / message.screen.height);
-      console.log(message);
-      message.y /= 2;
+      // Balls spawn at the midpoint
+      message.y = this.height / 2;
+
       // translate to bottom half of screen
       if (message.player === 1) {
-        message.y += (this.height + Engine.MIDWAY_HEIGHT) / 2;
+
       } else {
-        message.y -= Engine.MIDWAY_HEIGHT;
+
       }
+      
       this.createBall(
         message.x,
         message.y,
-        message.vx,
-        message.vy,
+        message.vx / 1000,
+        message.vy / 1000,
         message.color
       );
     }
@@ -416,6 +418,8 @@ var IndexView = BaseView.extend({
         case "in_colorize":
           $("#board").fadeOut('slow');
           $(".player-status").fadeOut('slow');
+          $("#players").fadeOut('slow');
+          $("#logo").fadeOut('slow');
           $("#ask-for-intro").fadeOut('slow', function() {
             $("#in-colorize").fadeIn('slow');
           });
@@ -427,7 +431,7 @@ var IndexView = BaseView.extend({
           $("#container").children().fadeOut('slow', function() {
             $(".player-status").show()
             $("#board").fadeIn('slow', function() {
-              $("#themesong")[0].play();
+              // $("#themesong")[0].play();
             });
           });
           break;
