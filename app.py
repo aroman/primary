@@ -38,6 +38,7 @@ class Application(tornado.web.Application):
             (r"/board", BoardHandler),
             (r"/socket/pad", PadSocketHandler),
             (r"/socket/board", BoardSocketHandler),
+            (r"/credits", CreditsHandler),
         ]
 
         self.players = collections.OrderedDict()
@@ -219,14 +220,23 @@ class BoardSocketHandler(tornado.websocket.WebSocketHandler):
         elif message['type'] == "introFinished":
             self.application.state = GameState.in_colorize
         elif message['type'] == "roundFinished":
+            # Save score
             for player in message['players']:
                 db.players.update(
                     {"_id": player['id']},
                     {"$set": { "score": player['score'] }}
                 )
+            # Reset colorized statuses
+            for player in self.application.players.values():
+                player.finishedColorize = False
             self.application.state = GameState.ask_for_intro
         elif message['type'] == "watchIntro":
             self.application.state = GameState.in_intro
+
+class CreditsHandler(BaseHandler):
+
+    def get(self):
+        self.render("credits.html")
 
 if __name__ == "__main__":
     tornado.options.parse_command_line()

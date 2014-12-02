@@ -129,7 +129,6 @@ var ColorizeView = BaseView.extend({
     
     var x = event.clientX * devicePixelRatio;
     var y = (event.clientY - $("body").scrollTop()) * devicePixelRatio;
-    console.log(x, y);
 
     if (this.actionMode == "wall") {
       if (this.levels[this.currentColor].current < Engine.WALL_COST) return;
@@ -419,6 +418,7 @@ var ColorizeView = BaseView.extend({
 
         case "in_colorize":
           this.resetLevels();
+          $("#skip-intro").parent().parent().hide();
           $("#watch-intro, #skip-intro, #wait-for-opponent").fadeOut("slow");
           // We're using _.delay and not passing a callback to the 
           // fadeOut call above because it won't fire if some of the

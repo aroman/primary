@@ -15,7 +15,7 @@ var Engine = {
   BALL_POINTS: 10, // player score points
   MIDWAY_HEIGHT: 20, // pixels
   REGEN_DELAY: 1000, // milliseconds
-  REGEN_INCREMENT: 0.5, // color points
+  REGEN_INCREMENT: 0.75, // color points
   HEARTBEAT_INTERVAL: 15000, // milliseconds
   BALL_VELOCITY_SCALE_DIVISOR: 500, // dividend is pixels
   MAX_WALL_WIDTH: 50 * devicePixelRatio, // pixels

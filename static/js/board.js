@@ -7,7 +7,7 @@ var IndexView = BaseView.extend({
     BaseView.prototype.initialize.call(this);
 
     // Initialize physics & geometry
-    this.width = (window.innerWidth * devicePixelRatio);
+    this.width = (window.innerWidth * devicePixelRatio) - 120;
     this.height = (window.innerHeight * devicePixelRatio) - (60 * 4);
     this.world = Physics();
     this.renderer = Physics.renderer('pixi', {
@@ -379,12 +379,11 @@ var IndexView = BaseView.extend({
       message.start.y /= 2;
       message.end.y /= 2;
 
-      // top half of screen
-      if (message.player === 0) {
+      if (message.player === 0) { // top half of screen
         message.start.y -= Engine.MIDWAY_HEIGHT;
         message.end.y -= Engine.MIDWAY_HEIGHT;
-      // bottom half of screen
-      } else {
+      
+      } else { // bottom half of screen
         message.start.y += (this.height + Engine.MIDWAY_HEIGHT) / 2;
         message.end.y += (this.height + Engine.MIDWAY_HEIGHT) / 2;
       }
@@ -401,13 +400,6 @@ var IndexView = BaseView.extend({
       message.x *= (this.width / message.screen.width);
       // Balls spawn at the midpoint
       message.y = this.height / 2;
-
-      // translate to bottom half of screen
-      if (message.player === 1) {
-
-      } else {
-
-      }
 
       this.createBall(
         message.x,
@@ -445,6 +437,7 @@ var IndexView = BaseView.extend({
           this.begunSlides = true;
           var that = this;
           $("#slides").show();
+          $("#players").fadeOut('slow');
           $("#board").fadeOut('slow');
           $(".player-status").fadeOut('slow');
           $("#ask-for-intro").fadeOut('slow', function() {
