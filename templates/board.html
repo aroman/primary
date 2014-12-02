@@ -139,9 +139,24 @@
     #themesong {
       display: none;
     }
+    #timer-top, #timer-bottom {
+      position: absolute;
+      left: 50%;
+      font-size: 50px;
+      font-family: 'Outage';
+      margin-left: -25px;
+      display: none;
+      color: #2D2D2D;
+    }
+    #timer-bottom {
+      bottom: 0;
+      z-index: 100;
+    }
   </style>
 
   <div id="container">
+    <div id="timer-top"></div>
+    <div id="timer-bottom"></div>
     <div id="player-status-1" class="player-status">
     </div>
     <div id="board"></div>
@@ -266,13 +281,20 @@
     <span class="player-name">{{! first_name }}</span>
     <img class="player-picture" src="{{! picture_url }}">
     {{!# score }}
-    <span class="player-score">Score: {{! score }}</span>
+    <span class="player-score">Score: {{! score }} + {{! round_score }}</span>
     {{!/ score }}
   </script>
 
   <script id="player-status-template" type="text/x-mustache-template">
     <div class="name"><span>{{! name }}</span></div>
-    <div class="score"><span>Score: {{! score }}</span></div>
+
+    {{!# score}}
+      <div class="score"><span>Score: {{! score }} + {{! round_score }}</span></div>
+    {{!/score}}
+    {{!^score}}
+      <div class="score"><span>Score: {{! round_score }}</span></div>
+    {{!/score}}
+
   </script>
 
 {% end %}

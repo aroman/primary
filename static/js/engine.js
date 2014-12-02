@@ -9,9 +9,10 @@ var Engine = {
   },
 
   COLORIZE_ROUNDS: 2, // <scalar>
-  ROUND_DURATION: 60000, // milliseconds
+  ROUND_SECONDS: 10, // seconds
   WALL_COST: 3, // color points 
   BALL_COST: 3, // color points
+  BALL_POINTS: 10, // player score points
   MIDWAY_HEIGHT: 20, // pixels
   REGEN_DELAY: 1000, // milliseconds
   REGEN_INCREMENT: 0.5, // color points

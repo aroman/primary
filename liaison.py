@@ -21,19 +21,27 @@ class Liaison(object):
 
     def __init__(self, db, player):
         self.player = player
+        self.db = db
         self.finishedColorize = False
         self.graph = facebook.GraphAPI(player['access_token'])
         if 'photo_ids' in player:
             self.photoIds = player['photo_ids']
         else:
-            self.photoIds = player['photo_ids'] = self.getPhotoIds()
-            db.players.save(player)
+            self.photoIds = self.getPhotoIds()
+            db.players.update(
+                {"_id": self.player['_id']},
+                {"$set": { "photo_ids": self.photoIds }}
+            )
 
     def getProfile(self):
         profile = self.graph.get_object("me")
         profile['picture_url'] = self.graph.get_object("me/picture",
             type="large", redirect=False)['data']['url']
-        profile['score'] = self.player['score']
+        player = self.db.players.find_one({"_id": self.player['_id']})
+        if 'score' in player:
+            profile['score'] = player['score']
+        else:
+            profile['score'] = 0
         return profile
 
     def getPhotoIds(self, after=None):

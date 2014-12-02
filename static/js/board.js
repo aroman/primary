@@ -6,7 +6,7 @@ var IndexView = BaseView.extend({
     this.socketPath = "/socket/board";
     BaseView.prototype.initialize.call(this);
 
-    // Physics stuff
+    // Initialize physics & geometry
     this.width = (window.innerWidth * devicePixelRatio);
     this.height = (window.innerHeight * devicePixelRatio) - (60 * 4);
     this.world = Physics();
@@ -30,25 +30,28 @@ var IndexView = BaseView.extend({
     this.world.on('step', this.onStep.bind(this));
     Physics.util.ticker.on(this.onTick.bind(this));
 
-    // start the ticker
+    // Start the ticker
     Physics.util.ticker.start();
 
     // Compile templates
     this.playerAvatarTemplate = Hogan.compile($("#player-avatar-template").html());
     this.playerStatusTemplate = Hogan.compile($("#player-status-template").html());
 
+    // Initialize variables & timers
     if (_.isEmpty(existingProfiles)) {
       this.players = [null, null];
     } else {
       this.players = existingProfiles;
     }
+
     this.render();
-    this.clearBoard();
+    this.resetBoard();
   },
 
   render: function() {
     if (this.state == 'in_game') {
       this.players.forEach(function(profile, i) {
+        profile.round_score = this.roundScores[i];
         var html = this.playerStatusTemplate.render(profile);
         this.$("#player-status-" + String(i + 1)).html(html);
       }, this);
@@ -56,15 +59,19 @@ var IndexView = BaseView.extend({
     else {
       this.players.forEach(function(profile, i) {
         if (_.isNull(profile)) {
-          var profile = {
+          var context = {
             first_name: "Player " + String(i + 1),
             picture_url: "http://i.imgur.com/2CIgGqF.png",
           };
         } else {
           // we always want to show a user's score, even if it's 0
-          // profile.score = String(profile.score);
+          var context = {
+            first_name: profile.first_name,
+            picture_url: profile.picture_url,
+            score: String(profile.score)
+          };
         }
-        var html = this.playerAvatarTemplate.render(profile);
+        var html = this.playerAvatarTemplate.render(context);
         this.$("#player-avatar-" + String(i + 1)).html(html);
       }, this);
     }
@@ -98,13 +105,13 @@ var IndexView = BaseView.extend({
         var ball = collision.bodyA;
         // top edge
         if (ball.state.pos.get(1) < 20) {
-          this.players[1].score += 10;
+          this.roundScores[1] += Engine.BALL_POINTS;
           this.render();
           this.world.remove(ball);
         }
         // bottom edge
         else if ((this.height - ball.state.pos.get(1)) < 20) {
-          this.players[0].score += 10;
+          this.roundScores[0] += Engine.BALL_POINTS;
           this.render();
           this.world.remove(ball);
         }
@@ -150,7 +157,12 @@ var IndexView = BaseView.extend({
     }
   },
 
-  clearBoard: function() {
+  resetBoard: function() {
+
+    this.secondsRemaining = Engine.ROUND_SECONDS;
+    this.gameTimer = null;
+
+    this.roundScores = [0, 0];
 
     _.each(this.world.getBodies(), function(body) {
       this.world.removeBody(body);
@@ -315,22 +327,37 @@ var IndexView = BaseView.extend({
     async.series(steps, callback);
   },
 
-  endRound: function() {
-    var ranks = _.sortBy(this.players, function(player) {
-      return player.score;
-    });
-    var results = _.map(this.players, function(player) {
-      return {
-        score: player.score,
-        id: player.id
-      }
-    });
+  gameTimerFired: function() {
+    if (this.secondsRemaining < 0) {
+      clearInterval(this.gameTimer);
 
-    this.sendMessage({
-      type: "roundFinished",
-      players: results
-    });
-    alert("Time's up,", ranks[0], "beat", ranks[1], "!");
+      var that = this;
+      var results = _.map(_.zip(this.players, this.roundScores), function(z) {
+        console.log(z);
+        var player = z[0];
+        var roundScore = z[1];
+        return {
+          score: player.score + roundScore,
+          id: player.id
+        }
+      });
+
+      this.sendMessage({
+        type: "roundFinished",
+        players: results
+      });
+
+      _.delay(function() {
+        window.location.reload();
+      }, 3000);
+    } else {
+      if (this.secondsRemaining < 10) {
+        $("#timer-top, #timer-bottom").css("color", "#F73C3C");
+      }
+      $("#timer-top, #timer-bottom").text(String(this.secondsRemaining));
+      $("#timer-top, #timer-bottom").fadeIn("slow");
+      this.secondsRemaining -= 1;
+    }
   },
 
   onSocketClosed: function() {
@@ -399,9 +426,16 @@ var IndexView = BaseView.extend({
 
 
         case "ask_for_intro":
+
           $("#board").fadeOut('slow');
           $(".player-status").fadeOut('slow');
-          $("#players, #in-colorize").fadeOut('slow', function() {
+
+          var classes = "animated zoomOutUp";
+          $("#players").addClass(classes);
+          $("#in-colorize").fadeOut('slow');
+          $("#players").one('webkitAnimationEnd', function() {
+            $("#players").removeClass(classes);
+            $("#players").hide();
             $("#ask-for-intro").fadeIn("slow");
           });
           break;
@@ -445,20 +479,25 @@ var IndexView = BaseView.extend({
 
         case "in_game":
           this.render();
-          this.clearBoard();
+          this.resetBoard();
           var that = this;
-          $("#container").children().fadeOut('slow', function() {
+          $("#container").children().fadeOut('slow');
+
+          _.delay(function() {
             $(".player-status").show()
             $("#board").fadeIn('slow', function() {
-              setTimeout(that.endRound.bind(that), Engine.ROUND_DURATION);
+              _.delay(function() {
+                that.gameTimer = setInterval(that.gameTimerFired.bind(that), 1000);
+              }, 3500);
               $("#themesong")[0].play();
             });
-          });
+          }, 800);
           break;
 
       }
 
       if (message.status != "in_game") {
+        $("#timer-top, #timer-bottom").fadeOut('slow');
           $("#themesong")[0].currentTime = 0;
           $("#themesong")[0].pause();
       }

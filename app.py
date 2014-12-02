@@ -114,8 +114,7 @@ class AuthHandler(BaseHandler):
             res = graph.extend_access_token(FB_APP_ID, FB_APP_SECRET)
             player = {
                 '_id': user['uid'],
-                'access_token': res['access_token'],
-                'score': 0
+                'access_token': res['access_token']
             }
             db.players.save(player)
             self.set_secure_cookie('user', user['uid'])
@@ -209,6 +208,7 @@ class BoardSocketHandler(tornado.websocket.WebSocketHandler):
         self.application.publish_state()
 
     def on_close(self):
+        logging.debug("BoardSocket@{} closed".format(id(self)))
         self.application.board = None
 
     def on_message(self, message):
@@ -220,10 +220,10 @@ class BoardSocketHandler(tornado.websocket.WebSocketHandler):
             self.application.state = GameState.in_colorize
         elif message['type'] == "roundFinished":
             for player in message['players']:
-                db.players.update({
+                db.players.update(
                     {"_id": player['id']},
-                    {"$set": {"score": player['score']}}
-                })
+                    {"$set": { "score": player['score'] }}
+                )
         elif message['type'] == "watchIntro":
             self.application.state = GameState.in_intro
 
