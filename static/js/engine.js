@@ -15,6 +15,7 @@ var Engine = {
   REGEN_DELAY: 1000, // milliseconds
   REGEN_INCREMENT: 0.5, // color points
   HEARTBEAT_INTERVAL: 15000, // milliseconds
+  BALL_VELOCITY_SCALE_DIVISOR: 500, // dividend is pixels
   MAX_WALL_WIDTH: 50 * devicePixelRatio, // pixels
   MIN_WALL_WIDTH: 400 * devicePixelRatio // pixels
 
