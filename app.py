@@ -224,6 +224,7 @@ class BoardSocketHandler(tornado.websocket.WebSocketHandler):
                     {"_id": player['id']},
                     {"$set": { "score": player['score'] }}
                 )
+            self.application.state = GameState.ask_for_intro
         elif message['type'] == "watchIntro":
             self.application.state = GameState.in_intro
 

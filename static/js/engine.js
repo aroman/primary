@@ -9,7 +9,7 @@ var Engine = {
   },
 
   COLORIZE_ROUNDS: 2, // <scalar>
-  ROUND_SECONDS: 10, // seconds
+  ROUND_SECONDS: 50, // seconds
   WALL_COST: 3, // color points 
   BALL_COST: 3, // color points
   BALL_POINTS: 10, // player score points

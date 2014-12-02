@@ -333,7 +333,6 @@ var IndexView = BaseView.extend({
 
       var that = this;
       var results = _.map(_.zip(this.players, this.roundScores), function(z) {
-        console.log(z);
         var player = z[0];
         var roundScore = z[1];
         return {

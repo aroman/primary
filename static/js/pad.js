@@ -407,7 +407,6 @@ var ColorizeView = BaseView.extend({
           $("#levels").fadeOut("slow");
 
           $("#wait-for-opponent").fadeIn("slow");
-          this.resetLevels();
           break;
 
         case "ask_for_intro":
@@ -418,6 +417,7 @@ var ColorizeView = BaseView.extend({
           break;
 
         case "in_colorize":
+          this.resetLevels();
           $("#watch-intro, #skip-intro, #wait-for-opponent").fadeOut("slow");
           // We're using _.delay and not passing a callback to the 
           // fadeOut call above because it won't fire if some of the
@@ -447,7 +447,7 @@ var ColorizeView = BaseView.extend({
           $("#container")
           .children()
           .not("#levels, #action, #status")
-          .fadeOut('slow', function () {
+          .fadeOut('slow', function() {
             $("#pad, #action").fadeIn('slow');
           });
           break;
