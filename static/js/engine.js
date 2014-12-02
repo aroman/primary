@@ -9,7 +9,7 @@ var Engine = {
   },
 
   COLORIZE_ROUNDS: 2, // <scalar>
-  ROUND_DURATION: 60000 // milliseconds
+  ROUND_DURATION: 60000, // milliseconds
   WALL_COST: 3, // color points 
   BALL_COST: 3, // color points
   MIDWAY_HEIGHT: 20, // pixels

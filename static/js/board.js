@@ -319,17 +319,18 @@ var IndexView = BaseView.extend({
     var ranks = _.sortBy(this.players, function(player) {
       return player.score;
     });
-    alert("Time's up,", ranks[0], "beat", ranks[1], "!");
     var results = _.map(this.players, function(player) {
       return {
         score: player.score,
         id: player.id
       }
     });
+
     this.sendMessage({
       type: "roundFinished",
       results: results
     });
+    alert("Time's up,", ranks[0], "beat", ranks[1], "!");
   },
 
   onSocketClosed: function() {
@@ -449,8 +450,8 @@ var IndexView = BaseView.extend({
           $("#container").children().fadeOut('slow', function() {
             $(".player-status").show()
             $("#board").fadeIn('slow', function() {
-              setTimeout(that.endRound, Engine.ROUND_DURATION);
-              // $("#themesong")[0].play();
+              setTimeout(that.endRound.bind(that), Engine.ROUND_DURATION);
+              $("#themesong")[0].play();
             });
           });
           break;
