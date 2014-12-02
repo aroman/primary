@@ -221,7 +221,7 @@ class BoardSocketHandler(tornado.websocket.WebSocketHandler):
         elif message['type'] == "roundFinished":
             for player in message['players']:
                 db.players.update({
-                    "_id": player['id'],
+                    {"_id": player['id']},
                     {"$set": {"score": player['score']}}
                 })
         elif message['type'] == "watchIntro":
