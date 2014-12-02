@@ -200,15 +200,20 @@ var ColorizeView = BaseView.extend({
     var event = event.originalEvent;
     if (event.touches.length === 1) {
       this.onMouseMove(event.touches[0]);
-    } else {
+    }
+    else if (event.touches.length === 2) {
+      // spurious input from color-change gesture
+      // no-op 
+    }
+    else {
       alert("unsupported gesture");
     }
   },
 
   onTouchEnd: function(event) {
     var event = event.originalEvent;
-    if (event.touches.length === 0) {
-      this.onMouseUp(event.touches[0]);
+    if (event.changedTouches.length === 1) {
+      this.onMouseUp(event.changedTouches[0]);
     }
   },
 

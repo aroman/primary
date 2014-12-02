@@ -364,12 +364,12 @@ var IndexView = BaseView.extend({
       } else {
 
       }
-      
+
       this.createBall(
         message.x,
         message.y,
-        message.vx / 1000,
-        message.vy / 1000,
+        message.vx / Engine.BALL_VELOCITY_SCALE_DIVISOR,
+        message.vy / Engine.BALL_VELOCITY_SCALE_DIVISOR,
         message.color
       );
     }
