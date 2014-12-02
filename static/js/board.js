@@ -328,7 +328,7 @@ var IndexView = BaseView.extend({
 
     this.sendMessage({
       type: "roundFinished",
-      results: results
+      players: results
     });
     alert("Time's up,", ranks[0], "beat", ranks[1], "!");
   },
