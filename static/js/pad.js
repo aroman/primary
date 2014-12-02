@@ -410,8 +410,9 @@ var ColorizeView = BaseView.extend({
           break;
 
         case "ask_for_intro":
-          $("#pad, #action, #wait-for-opponent, #compare").fadeOut('slow');
+          $("#pad, #action, #wait-for-opponent, #compare, #levels").fadeOut('slow');
           _.delay(function() {
+            $("#skip-intro").parents().show();
             $("#skip-intro, #watch-intro").fadeIn("slow");
           }, 700);
           break;
