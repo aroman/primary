@@ -8,7 +8,7 @@ var Engine = {
     blue: 0x4A90E2,
   },
 
-  COLORIZE_ROUNDS: 2, // <scalar>
+  COLORIZE_ROUNDS: 3, // <scalar>
   ROUND_SECONDS: 50, // seconds
   WALL_COST: 3, // color points 
   BALL_COST: 3, // color points
